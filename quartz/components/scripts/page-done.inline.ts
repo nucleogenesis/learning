@@ -14,6 +14,8 @@ declare global {
   }
 }
 
+// IIFE-wrap (see comment in review.inline.ts).
+;(() => {
 function setLabel(btn: HTMLButtonElement, done: boolean) {
   btn.setAttribute("aria-pressed", done ? "true" : "false")
   const label = btn.querySelector<HTMLElement>(".page-done-label")
@@ -46,3 +48,4 @@ function setupPageDone() {
 }
 
 document.addEventListener("nav", setupPageDone)
+})()

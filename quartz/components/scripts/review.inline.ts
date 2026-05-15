@@ -25,6 +25,11 @@ declare global {
   }
 }
 
+// Wrap the whole script body in an IIFE so module-level identifiers don't
+// leak into the page's global scope and collide with other inline scripts
+// (esbuild's `format: esm` output, injected as a non-module <script>, would
+// otherwise place these on `window`).
+;(() => {
 type CardEntry = {
   id: string
   slug: string
@@ -214,3 +219,4 @@ async function setup() {
 }
 
 document.addEventListener("nav", setup)
+})()

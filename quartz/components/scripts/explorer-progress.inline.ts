@@ -23,6 +23,8 @@ declare global {
   }
 }
 
+// IIFE-wrap (see comment in review.inline.ts).
+;(() => {
 async function loadIndex(): Promise<Record<string, number>> {
   if (window.__learningTodosIndex) return window.__learningTodosIndex
   try {
@@ -159,3 +161,4 @@ function setupExplorerProgress() {
 }
 
 document.addEventListener("nav", setupExplorerProgress)
+})()

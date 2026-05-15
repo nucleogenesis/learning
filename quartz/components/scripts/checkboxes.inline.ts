@@ -21,6 +21,8 @@ declare global {
   }
 }
 
+// IIFE-wrap (see comment in review.inline.ts).
+;(() => {
 function onChange(this: HTMLInputElement) {
   const id = this.dataset.todoId
   if (!id) return
@@ -43,3 +45,4 @@ function setupCheckboxes() {
 }
 
 document.addEventListener("nav", setupCheckboxes)
+})()

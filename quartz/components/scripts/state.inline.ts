@@ -44,6 +44,9 @@ declare global {
   }
 }
 
+// IIFE-wrap to keep module-level identifiers out of global scope (see
+// comment in review.inline.ts for why this matters).
+;(() => {
 const STORE_KEY = "learning-notes-state-v1"
 const LEGACY_SRS_KEY = "learning-notes-srs-v1"
 const LEGACY_CHECKBOX_RE = /^(.+)-checkbox-(\d+)$/
@@ -156,3 +159,4 @@ if (!window.LearningState) {
   // blob even before any feature script runs.
   readRaw()
 }
+})()
