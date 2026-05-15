@@ -5,11 +5,9 @@
  *
  * Cards: each `li.flashcard[data-card-id]` carries a `.flashcard-srs` button
  *   row (Again/Hard/Good/Easy) and a `.flashcard-due` text line. SM-2 state
- *   lives in localStorage under `learning-notes-srs-v1`, keyed by card id.
- *   On a rating click, schedule advances and the due-line updates.
+ *   lives in `window.LearningState.cards` (single unified store). On a rating
+ *   click, schedule advances and the due-line updates.
  */
-
-const SRS_STORE = "learning-notes-srs-v1"
 
 type Rating = "again" | "hard" | "good" | "easy"
 
@@ -21,29 +19,20 @@ type CardState = {
   lastReviewMs: number // epoch ms
 }
 
-type Store = Record<string, CardState>
+// Each inline script is bundled in isolation; redeclare the bits of the
+// shared state shape this script touches so it type-checks standalone.
+declare global {
+  interface Window {
+    LearningState?: {
+      read: () => { cards: Record<string, CardState> }
+      update: (fn: (s: { cards: Record<string, CardState> }) => void) => void
+    }
+  }
+}
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
-function loadStore(): Store {
-  try {
-    const raw = localStorage.getItem(SRS_STORE)
-    if (!raw) return {}
-    return JSON.parse(raw) as Store
-  } catch {
-    return {}
-  }
-}
-
-function saveStore(store: Store) {
-  try {
-    localStorage.setItem(SRS_STORE, JSON.stringify(store))
-  } catch {
-    // quota or sandboxed iframe — silently ignore
-  }
-}
-
-function defaultState(nowMs: number): CardState {
+function defaultCardState(nowMs: number): CardState {
   return {
     ef: 2.5,
     reps: 0,
@@ -98,7 +87,7 @@ function formatDue(state: CardState, nowMs: number): string {
 }
 
 function setupCards() {
-  const store = loadStore()
+  if (!window.LearningState) return
   const cards = document.querySelectorAll<HTMLElement>("li.flashcard[data-card-id]")
   cards.forEach((card) => {
     const id = card.getAttribute("data-card-id")
@@ -106,7 +95,7 @@ function setupCards() {
 
     const dueEl = card.querySelector<HTMLElement>(".flashcard-due")
     const refresh = () => {
-      const state = store[id]
+      const state = window.LearningState!.read().cards[id]
       if (dueEl) dueEl.textContent = state ? formatDue(state, Date.now()) : ""
       if (state) {
         card.classList.toggle("is-due", state.dueMs <= Date.now())
@@ -121,9 +110,10 @@ function setupCards() {
       const rating = target.dataset.rating as Rating | undefined
       if (!rating) return
       const now = Date.now()
-      const current = store[id] ?? defaultState(now)
-      store[id] = nextState(current, rating, now)
-      saveStore(store)
+      window.LearningState!.update((s) => {
+        const current = s.cards[id] ?? defaultCardState(now)
+        s.cards[id] = nextState(current, rating, now)
+      })
       refresh()
     }
 

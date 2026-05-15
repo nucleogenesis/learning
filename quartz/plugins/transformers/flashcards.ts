@@ -1,10 +1,15 @@
 import { QuartzTransformerPlugin } from "../types"
 import { Root, Html, Paragraph, Text, ListItem } from "mdast"
+import type { Root as HtmlRoot, Element as HastElement } from "hast"
 import { visit } from "unist-util-visit"
 import { toString as mdastToString } from "mdast-util-to-string"
 import { JSResource, CSSResource } from "../../util/resources"
 // @ts-ignore
+import stateScript from "../../components/scripts/state.inline"
+// @ts-ignore
 import flashcardsScript from "../../components/scripts/flashcards.inline"
+// @ts-ignore
+import checkboxesScript from "../../components/scripts/checkboxes.inline"
 import flashcardsStyle from "../../components/styles/flashcards.inline.scss"
 
 const CARD_TAG_RE = /(^|\s)#card\b/
@@ -147,10 +152,46 @@ export const Flashcards: QuartzTransformerPlugin = () => ({
       },
     ]
   },
+  htmlPlugins() {
+    return [
+      () => (tree: HtmlRoot, file) => {
+        // Enable GFM task-list checkboxes (Quartz's enableCheckbox option does
+        // the same job; we do it here so we can also stamp a stable
+        // `data-todo-id` for the state-driven persistence layer).
+        const slug = (file.data.slug ?? "") as string
+        let idx = 0
+        visit(tree, "element", (node: HastElement) => {
+          if (node.tagName !== "input") return
+          const props = node.properties ?? {}
+          if (props.type !== "checkbox") return
+          const isChecked = props.checked === true || props.checked === ""
+          node.properties = {
+            type: "checkbox",
+            disabled: false,
+            checked: isChecked,
+            class: ["checkbox-toggle"],
+            "data-todo-id": `${slug}/${idx}`,
+          }
+          idx += 1
+        })
+      },
+    ]
+  },
   externalResources() {
     const js: JSResource[] = [
       {
+        // State module loads first so feature scripts can read window.LearningState.
+        script: stateScript,
+        loadTime: "afterDOMReady",
+        contentType: "inline",
+      },
+      {
         script: flashcardsScript,
+        loadTime: "afterDOMReady",
+        contentType: "inline",
+      },
+      {
+        script: checkboxesScript,
         loadTime: "afterDOMReady",
         contentType: "inline",
       },

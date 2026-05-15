@@ -65,7 +65,9 @@ const config: QuartzConfig = {
         keepBackground: false,
       }),
       Plugin.Flashcards(),
-      Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false, enableCheckbox: true }),
+      // Checkbox enabling + state persistence is owned by Plugin.Flashcards();
+      // see quartz/components/scripts/checkboxes.inline.ts.
+      Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false, enableCheckbox: false }),
       Plugin.GitHubFlavoredMarkdown(),
       Plugin.TableOfContents(),
       Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
