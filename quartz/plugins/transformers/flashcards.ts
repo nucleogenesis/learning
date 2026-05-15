@@ -241,7 +241,11 @@ export const Flashcards: QuartzTransformerPlugin = () => ({
     ]
     const css: CSSResource[] = [
       {
+        // Inline the CSS into a <style> tag. Without this flag, Quartz puts
+        // the raw CSS string into a <link href="..."> as if it were a URL —
+        // which 404s for the @charset "UTF-8"; /* … */ literal.
         content: flashcardsStyle,
+        inline: true,
       },
     ]
     return { js, css }

@@ -32,6 +32,9 @@ declare global {
   }
 }
 
+// IIFE-wrap so module-level identifiers don't pollute the global scope and
+// collide with other inline scripts.
+;(() => {
 const DAY_MS = 24 * 60 * 60 * 1000
 
 function defaultCardState(nowMs: number): CardState {
@@ -165,3 +168,4 @@ document.addEventListener("nav", () => {
   setupCloze()
   setupCards()
 })
+})()
