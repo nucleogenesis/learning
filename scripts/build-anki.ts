@@ -46,27 +46,32 @@ async function main() {
 
   await fs.mkdir(DECKS_ROOT, { recursive: true })
 
-  // Group by second-level namespace ("DSA", "Trees", etc.).
-  const byGroup = new Map<string, Card[]>()
+  // Group by source page (one deck per Logseq page). The bundled sql.js in
+  // anki-apkg-export has a 16MB hard cap, which OOMs on aggregate decks
+  // beyond ~60 cards. Per-page decks stay comfortably under the limit, and
+  // map cleanly onto Anki's hierarchical deck names via `::`.
+  const byPage = new Map<string, Card[]>()
   for (const c of cards) {
-    const arr = byGroup.get(c.group) ?? []
+    const arr = byPage.get(c.sourcePage) ?? []
     arr.push(c)
-    byGroup.set(c.group, arr)
+    byPage.set(c.sourcePage, arr)
   }
 
-  // Per-group decks.
-  const generated: { name: string; file: string; count: number }[] = []
-  for (const [group, groupCards] of byGroup) {
-    const fileName = `${slugify(group)}.apkg`
-    await writeDeck(`Learning ▸ ${group}`, groupCards, path.join(DECKS_ROOT, fileName))
-    generated.push({ name: `Learning ▸ ${group}`, file: fileName, count: groupCards.length })
-  }
-
-  // Master deck.
-  if (cards.length > 0) {
-    const master = "learning-notes-all.apkg"
-    await writeDeck("Learning (all)", cards, path.join(DECKS_ROOT, master))
-    generated.push({ name: "Learning (all)", file: master, count: cards.length })
+  // Per-page decks.
+  const generated: { name: string; file: string; count: number; group: string }[] = []
+  for (const [page, pageCards] of [...byPage.entries()].sort()) {
+    if (pageCards.length === 0) continue
+    const fileName = `${slugify(page.replace(/\//g, "-"))}.apkg`
+    // Anki uses `::` as the deck-hierarchy separator. "Learning::DSA::Graphs::Basics"
+    // imports as a nested deck tree.
+    const deckName = page.replace(/\//g, "::")
+    await writeDeck(deckName, pageCards, path.join(DECKS_ROOT, fileName))
+    generated.push({
+      name: deckName,
+      file: fileName,
+      count: pageCards.length,
+      group: pageCards[0].group,
+    })
   }
 
   // index.html listing.
@@ -249,13 +254,27 @@ async function writeDeck(name: string, cards: Card[], outPath: string): Promise<
 }
 
 function renderIndex(
-  decks: { name: string; file: string; count: number }[],
+  decks: { name: string; file: string; count: number; group: string }[],
 ): string {
-  const rows = decks
-    .map(
-      (d) =>
-        `<li><a href="${d.file}" download>${escapeHtml(d.name)}</a> — ${d.count} card${d.count === 1 ? "" : "s"}</li>`,
-    )
+  // Group rows by `group` (top-level topic) so the listing is readable.
+  const byGroup = new Map<string, typeof decks>()
+  for (const d of decks) {
+    const arr = byGroup.get(d.group) ?? []
+    arr.push(d)
+    byGroup.set(d.group, arr)
+  }
+  const totalCards = decks.reduce((acc, d) => acc + d.count, 0)
+  const sections = [...byGroup.entries()]
+    .sort()
+    .map(([group, groupDecks]) => {
+      const rows = groupDecks
+        .map(
+          (d) =>
+            `<li><a href="${d.file}" download>${escapeHtml(d.name)}</a> — ${d.count} card${d.count === 1 ? "" : "s"}</li>`,
+        )
+        .join("\n")
+      return `<h2>${escapeHtml(group)}</h2>\n<ul>\n${rows}\n</ul>`
+    })
     .join("\n")
   return `<!doctype html>
 <html lang="en">
@@ -266,6 +285,7 @@ function renderIndex(
 <style>
   body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; }
   h1 { font-size: 1.4rem; margin-bottom: 0.4rem; }
+  h2 { font-size: 1.1rem; margin: 1.8rem 0 0.4rem; }
   p.lede { color: #666; margin-top: 0; }
   ul { padding-left: 1.2rem; }
   li { margin: 0.4rem 0; }
@@ -275,10 +295,8 @@ function renderIndex(
 </head>
 <body>
 <h1>Anki decks</h1>
-<p class="lede">Downloadable <code>.apkg</code> files generated from the <code>#card</code> and <code>{{cloze}}</code> entries on this site. Import into Anki via <strong>File → Import</strong>.</p>
-<ul>
-${rows}
-</ul>
+<p class="lede">Downloadable <code>.apkg</code> files generated from the <code>#card</code> and <code>{{cloze}}</code> entries on this site (${decks.length} decks, ${totalCards} cards). Deck names use Anki's <code>::</code> hierarchy separator — they import as a nested deck tree. Import via <strong>File → Import</strong>.</p>
+${sections}
 <p style="margin-top:2rem;color:#888;font-size:0.85em">← <a href="..">back to the site</a></p>
 </body>
 </html>
