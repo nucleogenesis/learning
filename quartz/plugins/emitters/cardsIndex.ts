@@ -13,6 +13,8 @@ import { Element as HastElement, Root as HtmlRoot } from "hast"
  * Each entry contains:
  *   - id: the FNV-1a hash stamped by the Flashcards transformer
  *   - slug: source page's slug, for linking back from /review
+ *   - tags: lowercased, slug-friendly tag list inherited from the source
+ *     page's frontmatter `tags:` (drives the /review tag filter UI)
  *   - question: plain-text question (for sort / search later)
  *   - html: the full <li class="flashcard">…</li> HTML, ready to inject
  *
@@ -23,8 +25,24 @@ import { Element as HastElement, Root as HtmlRoot } from "hast"
 type CardEntry = {
   id: string
   slug: string
+  tags: string[]
   question: string
   html: string
+}
+
+function slugifyTag(t: unknown): string {
+  return String(t ?? "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+}
+
+function pageTags(file: { data: { frontmatter?: Record<string, unknown> } }): string[] {
+  const raw = file.data.frontmatter?.tags
+  if (!Array.isArray(raw)) return []
+  const slugged = raw.map(slugifyTag).filter((t) => t.length > 0)
+  // De-dup while preserving order.
+  return [...new Set(slugged)]
 }
 
 function getClassList(node: HastElement): string[] {
@@ -64,6 +82,7 @@ export const CardsIndex: QuartzEmitterPlugin = () => ({
 
     for (const [tree, file] of content) {
       const slug = (file.data.slug ?? "") as string
+      const tags = pageTags(file as { data: { frontmatter?: Record<string, unknown> } })
       visit(tree as HtmlRoot, "element", (node: HastElement) => {
         if (node.tagName !== "li") return
         const cls = getClassList(node)
@@ -78,6 +97,7 @@ export const CardsIndex: QuartzEmitterPlugin = () => ({
         cards.push({
           id,
           slug,
+          tags,
           question: findQuestionText(node),
           html: toHtml(node, { allowDangerousHtml: true }),
         })
