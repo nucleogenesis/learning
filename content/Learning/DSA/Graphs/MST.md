@@ -1,9 +1,8 @@
 ---
 title: MST
-tags: [learning, dsa, graphs, mst]
+tags: [learning, dsa, graphs, mst, kruskal, prim]
 lastUpdated: 2026-05-15
 ---
-
 # Minimum spanning tree — Kruskal and Prim
 
 > Convention: Answer blocks are children of "Show answer" parents. Click the triangle to collapse — Logseq remembers.
@@ -18,8 +17,7 @@ That's the **minimum spanning tree** (MST) problem. Real-world versions:
 - **Clustering**: cut the heaviest few edges of an MST and the connected pieces are natural clusters (single-linkage clustering).
 - **Approximation for traveling salesman**: an MST is a 2-approximation for the metric TSP — useful when you need a "good enough" route fast.
 - **Image segmentation**: variations of MST split images into regions of similar color.
-
-Two classic algorithms get there: **Kruskal's** (sort edges, add the cheapest one that doesn't create a cycle) and **Prim's** (grow a single tree outward from a starting vertex, always picking the cheapest edge that leaves the current tree). Both achieve `O(E log V)` time on a graph with `V` vertices and `E` edges. They're each natural in different settings — pick based on what data structures you already have.
+  - Two classic algorithms get there: **Kruskal's** (sort edges, add the cheapest one that doesn't create a cycle) and **Prim's** (grow a single tree outward from a starting vertex, always picking the cheapest edge that leaves the current tree). Both achieve `O(E log V)` time on a graph with `V` vertices and `E` edges. They're each natural in different settings — pick based on what data structures you already have.
 
 ## A tiny worked example
 
@@ -46,8 +44,7 @@ Edge list:
 
 The MST should include 4 edges (a tree on 5 vertices has `V - 1 = 4` edges) with minimum total weight.
 
-**Naming the parts**:
-
+- **Naming the parts**:
 - **Spanning tree** — a subset of edges that touches every vertex and forms a tree (connected + acyclic, `V - 1` edges).
 - **Minimum spanning tree** — the spanning tree with the smallest total edge weight.
 - **MST is not unique** if edge weights tie; algorithms may produce different valid MSTs in that case.
@@ -78,17 +75,21 @@ Time: `O(E log E)` for sorting plus `O(E · α(V))` for DSU operations → effec
 
 Sorted edges: `(A,B,1), (C,D,2), (B,D,3), (A,C,4), (B,E,5), (D,E,6)`.
 
-1. `(A,B,1)`: `find(A) ≠ find(B)` → union. MST so far: `{(A,B,1)}`. Weight: 1.
-2. `(C,D,2)`: different components → union. MST: `{(A,B,1), (C,D,2)}`. Weight: 3.
-3. `(B,D,3)`: now `{A,B}` and `{C,D}` are different → union. MST: `{(A,B,1), (C,D,2), (B,D,3)}`. Weight: 6.
-4. `(A,C,4)`: `find(A) = find(C)` now (both in `{A,B,C,D}`). Skip — would create a cycle.
-5. `(B,E,5)`: different components (E is alone) → union. MST: `{(A,B,1), (C,D,2), (B,D,3), (B,E,5)}`. Weight: 11. Done — 4 edges, 5 vertices, tree complete.
+`(A,B,1)`: `find(A) ≠ find(B)` → union. MST so far: `{(A,B,1)}`. Weight: 1.
+
+`(C,D,2)`: different components → union. MST: `{(A,B,1), (C,D,2)}`. Weight: 3.
+
+`(B,D,3)`: now `{A,B}` and `{C,D}` are different → union. MST: `{(A,B,1), (C,D,2), (B,D,3)}`. Weight: 6.
+
+`(A,C,4)`: `find(A) = find(C)` now (both in `{A,B,C,D}`). Skip — would create a cycle.
+
+`(B,E,5)`: different components (E is alone) → union. MST: `{(A,B,1), (C,D,2), (B,D,3), (B,E,5)}`. Weight: 11. Done — 4 edges, 5 vertices, tree complete.
 
 Final MST: total cost **11**.
 
 ### Why does the greedy choice work?
 
-**The cut property** (informal): for any partition of the vertices into two sets, the minimum-weight edge crossing the partition is part of *some* MST.
+- **The cut property** (informal): for any partition of the vertices into two sets, the minimum-weight edge crossing the partition is part of *some* MST.
 
 Kruskal's keeps picking the cheapest edge that connects two so-far-disjoint components, which by the cut property must be safe to add. The formal proof is an exchange argument: if some optimal MST didn't include edge `e`, you could swap `e` in (and a heavier crossing-edge out) without making the tree worse. So the greedy choice is always optimal.
 
@@ -128,11 +129,15 @@ Time: `O(E log V)` with a binary heap. (Each edge is pushed at most once; each p
 
 Heap starts with `A`'s edges: `[(1, A, B), (4, A, C)]`. `in_mst = {A}`.
 
-1. Pop `(1, A, B)`. B not in MST → add. MST: `{(A,B,1)}`. Push B's outgoing edges to non-MST vertices: `(3, B, D), (5, B, E)`. Heap: `[(3, B, D), (4, A, C), (5, B, E)]`. `in_mst = {A, B}`.
-2. Pop `(3, B, D)`. D not in MST → add. MST: `{(A,B,1), (B,D,3)}`. Push D's outgoing edges: `(2, D, C), (6, D, E)`. Heap: `[(2, D, C), (4, A, C), (5, B, E), (6, D, E)]`. `in_mst = {A, B, D}`.
-3. Pop `(2, D, C)`. C not in MST → add. MST: `{(A,B,1), (B,D,3), (D,C,2)}`. Push C's outgoing edges to non-MST vertices: `(4, C, A)` skipped (A already in MST), nothing else. Heap: `[(4, A, C), (5, B, E), (6, D, E)]`. `in_mst = {A, B, C, D}`.
-4. Pop `(4, A, C)`. C in MST → skip.
-5. Pop `(5, B, E)`. E not in MST → add. MST: `{(A,B,1), (B,D,3), (D,C,2), (B,E,5)}`. Done.
+Pop `(1, A, B)`. B not in MST → add. MST: `{(A,B,1)}`. Push B's outgoing edges to non-MST vertices: `(3, B, D), (5, B, E)`. Heap: `[(3, B, D), (4, A, C), (5, B, E)]`. `in_mst = {A, B}`.
+
+Pop `(3, B, D)`. D not in MST → add. MST: `{(A,B,1), (B,D,3)}`. Push D's outgoing edges: `(2, D, C), (6, D, E)`. Heap: `[(2, D, C), (4, A, C), (5, B, E), (6, D, E)]`. `in_mst = {A, B, D}`.
+
+Pop `(2, D, C)`. C not in MST → add. MST: `{(A,B,1), (B,D,3), (D,C,2)}`. Push C's outgoing edges to non-MST vertices: `(4, C, A)` skipped (A already in MST), nothing else. Heap: `[(4, A, C), (5, B, E), (6, D, E)]`. `in_mst = {A, B, C, D}`.
+
+Pop `(4, A, C)`. C in MST → skip.
+
+Pop `(5, B, E)`. E not in MST → add. MST: `{(A,B,1), (B,D,3), (D,C,2), (B,E,5)}`. Done.
 
 Final MST: total cost **11** (same as Kruskal — there's a unique MST here).
 
@@ -150,7 +155,7 @@ Final MST: total cost **11** (same as Kruskal — there's a unique MST here).
 | You already have DSU around | ✅ pick Kruskal | — |
 | You already have a heap-based traversal in your toolbox (Dijkstra) | — | ✅ pick Prim (same shape) |
 
-**Heuristic**: if you can pick freely, Kruskal's is slightly easier to reason about (sort edges, add cheap ones, skip if cycle). Prim's has the advantage of being structurally identical to Dijkstra, so if you've internalized one you basically know the other.
+- **Heuristic**: if you can pick freely, Kruskal's is slightly easier to reason about (sort edges, add cheap ones, skip if cycle). Prim's has the advantage of being structurally identical to Dijkstra, so if you've internalized one you basically know the other.
 
 ## 🔍 Quick check (try before scrolling)
 
@@ -198,9 +203,12 @@ def second_best_mst(vertices, edges):
 ```
 
 - Show the answer
-  - ```python
-    remaining = [e for e in edges if e != excluded_edge]
-    ```
+
+```python
+
+remaining = [e for e in edges if e != excluded_edge]
+
+```
   - The simple approach is `O(V·E log V)` — `V-1` re-runs of Kruskal. There's a fancier `O(E log V)` algorithm using MST tree structure and LCA queries, but the brute-force is fine for most practical inputs.
 
 #### From scratch
@@ -211,15 +219,15 @@ Implement Prim's algorithm (with priority queue) from a blank file. Test it on t
 
 ```python
 def kruskal_buggy(vertices, edges):
-   dsu = DSU(len(vertices))
-   mst = []
-   total = 0
-   for u, v, w in edges:                      # ← suspicious
-       if dsu.find(u) != dsu.find(v):
-           dsu.union(u, v)
-           mst.append((u, v, w))
-           total += w
-   return mst, total
+    dsu = DSU(len(vertices))
+    mst = []
+    total = 0
+    for u, v, w in edges:                      # ← suspicious
+        if dsu.find(u) != dsu.find(v):
+            dsu.union(u, v)
+            mst.append((u, v, w))
+            total += w
+    return mst, total
 ```
 
 Predict the bug before revealing.
@@ -268,10 +276,13 @@ If you can't, re-read the algorithm sections.
 
 Honest yes/no:
 
-- Can I write Kruskal's algorithm from scratch (assuming DSU is given)?
-- Can I write Prim's algorithm from scratch using a priority queue?
-- Can I trace either algorithm on a 5–6 vertex graph by hand and reach the right answer?
-- Can I explain in one sentence why both algorithms are correct (cut property)?
+Can I write Kruskal's algorithm from scratch (assuming DSU is given)?
+
+Can I write Prim's algorithm from scratch using a priority queue?
+
+Can I trace either algorithm on a 5–6 vertex graph by hand and reach the right answer?
+
+Can I explain in one sentence why both algorithms are correct (cut property)?
 
 If any "no", do one practice exercise. If all "yes", move on to [[Learning/DSA/Graphs/Shortest-Paths]] — Prim's heap-driven structure carries directly over.
 

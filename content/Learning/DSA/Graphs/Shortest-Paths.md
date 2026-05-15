@@ -3,7 +3,6 @@ title: Shortest-Paths
 tags: [learning, dsa, graphs, shortest-paths, dijkstra, bellman-ford, floyd-warshall]
 lastUpdated: 2026-05-15
 ---
-
 # Shortest paths — BFS, Dijkstra, Bellman-Ford, Floyd-Warshall
 
 > Convention: Answer blocks are children of "Show answer" parents. Click the triangle to collapse — Logseq remembers.
@@ -12,9 +11,11 @@ lastUpdated: 2026-05-15
 
 You open Google Maps and ask for the fastest route across town. Behind the scenes:
 
-- Intersections are vertices.
-- Roads are edges, weighted by predicted travel time (which depends on time of day, traffic, road type, etc.).
-- The "fastest route" is the shortest path in that weighted graph.
+Intersections are vertices.
+
+Roads are edges, weighted by predicted travel time (which depends on time of day, traffic, road type, etc.).
+
+The "fastest route" is the shortest path in that weighted graph.
 
 Other real-world shortest-path problems:
 
@@ -22,17 +23,14 @@ Other real-world shortest-path problems:
 - **Currency arbitrage**: vertices = currencies, edges = exchange rates (negated logs of rates). A negative cycle = profitable arbitrage loop.
 - **Game AI / pathfinding**: A* (a Dijkstra variant) on grids and navigation meshes.
 - **Sequence alignment**: shortest path in a DAG of "edit operations" = optimal alignment.
-
-There are four algorithms in the standard toolkit, and **which one you use depends on what your graph looks like**:
-
-| Graph type | Algorithm | Time |
-|---|---|---|
-| Unweighted | **BFS** | `O(V + E)` |
-| Non-negative weights | **Dijkstra** | `O((V + E) log V)` with binary heap |
-| Negative weights allowed | **Bellman-Ford** | `O(V · E)` |
-| All-pairs (small `V`) | **Floyd-Warshall** | `O(V³)` |
-
-This page walks through all four. The "pick the right one" decision is at the bottom — make sure you internalize it.
+  - There are four algorithms in the standard toolkit, and **which one you use depends on what your graph looks like**:
+  - | Graph type | Algorithm | Time |
+  - |---|---|---|
+  - | Unweighted | **BFS** | `O(V + E)` |
+  - | Non-negative weights | **Dijkstra** | `O((V + E) log V)` with binary heap |
+  - | Negative weights allowed | **Bellman-Ford** | `O(V · E)` |
+  - | All-pairs (small `V`) | **Floyd-Warshall** | `O(V³)` |
+  - This page walks through all four. The "pick the right one" decision is at the bottom — make sure you internalize it.
 
 ## A tiny worked example
 
@@ -59,14 +57,17 @@ Edges (weighted):
 
 Shortest paths from `A`:
 
-- to A: 0
-- to B: 1 (via A→B)
-- to C: 4 (via A→C)
-- to D: 3 (via A→B→D)
-- to E: 4 (via A→B→D→E, total 1+2+1=4 — beats A→B→E of total 1+3=4 tie; algorithms may pick either)
+to A: 0
 
-**Naming the parts**:
+to B: 1 (via A→B)
 
+to C: 4 (via A→C)
+
+to D: 3 (via A→B→D)
+
+to E: 4 (via A→B→D→E, total 1+2+1=4 — beats A→B→E of total 1+3=4 tie; algorithms may pick either)
+
+- **Naming the parts**:
 - **Source** — the starting vertex.
 - **Distance** — sum of edge weights along a path (sometimes "cost").
 - **Relaxation** — the core operation: "if going through `u` to reach `v` is cheaper than my current best, update `v`'s distance and parent."
@@ -93,7 +94,7 @@ def bfs_distances(graph, source):
 
 Already covered in [[Learning/DSA/Graphs/Traversals]]. Re-read that page if BFS feels rusty.
 
-**0-1 BFS variant**: if edges only have weights 0 or 1, use a deque — push 0-weight neighbors to the *front*, 1-weight neighbors to the *back*. Still `O(V + E)`, beats Dijkstra for this special case.
+- **0-1 BFS variant**: if edges only have weights 0 or 1, use a deque — push 0-weight neighbors to the *front*, 1-weight neighbors to the *back*. Still `O(V + E)`, beats Dijkstra for this special case.
 
 ## Algorithm 2: Dijkstra — non-negative weights
 
@@ -123,7 +124,7 @@ Time: `O((V + E) log V)` with a binary heap.
 
 ### Why does it work?
 
-**Invariant**: the first time Dijkstra pops a vertex from the heap, its distance is finalized (correct). This depends on **non-negative weights** — adding more edges can never make a path shorter, so once we've found the cheapest way to reach `v`, no later path can beat it.
+- **Invariant**: the first time Dijkstra pops a vertex from the heap, its distance is finalized (correct). This depends on **non-negative weights** — adding more edges can never make a path shorter, so once we've found the cheapest way to reach `v`, no later path can beat it.
 
 This invariant fails with negative edges, which is why Dijkstra is wrong on negative-weight graphs.
 
@@ -228,7 +229,7 @@ def floyd_warshall(num_vertices, edges):
 
 Time: `O(V³)`. Space: `O(V²)`.
 
-**When to use**: small dense graphs where you need *every* shortest path, not just from one source. For sparse graphs, running Dijkstra (or Bellman-Ford if negatives are possible) from every source can be faster: `O(V · (V + E) log V)` vs `O(V³)`.
+- **When to use**: small dense graphs where you need *every* shortest path, not just from one source. For sparse graphs, running Dijkstra (or Bellman-Ford if negatives are possible) from every source can be faster: `O(V · (V + E) log V)` vs `O(V³)`.
 
 ## Pick the right algorithm — decision tree
 
@@ -309,14 +310,18 @@ def reconstruct_path(parent, target):
 ```
 
 - Show the answer
-  - ```python
-    parent[u] = v
-    ```
+
+```python
+
+parent[u] = v
+
+```
   - ```python
     path.append(cur)
     cur = parent[cur]
     ```
-  - Each time we improve `u`'s distance, we record who got us there. To reconstruct, walk parents back from target until we hit `None` (the source's parent). Reverse to get start→target order.
+
+Each time we improve `u`'s distance, we record who got us there. To reconstruct, walk parents back from target until we hit `None` (the source's parent). Reverse to get start→target order.
 
 #### From scratch
 
@@ -388,17 +393,24 @@ If you can't construct the counterexample, the Dijkstra invariant ("first-pop is
 
 Honest yes/no:
 
-- Can I write Dijkstra from scratch (with priority queue + path reconstruction)?
-- Can I explain why Dijkstra fails on negative weights, with a concrete counterexample?
-- Can I write Bellman-Ford from scratch and explain how it detects negative cycles?
-- Can I look at a graph problem and pick the right shortest-path algorithm in <30 seconds?
+Can I write Dijkstra from scratch (with priority queue + path reconstruction)?
+
+Can I explain why Dijkstra fails on negative weights, with a concrete counterexample?
+
+Can I write Bellman-Ford from scratch and explain how it detects negative cycles?
+
+Can I look at a graph problem and pick the right shortest-path algorithm in <30 seconds?
 
 If any "no", do one practice exercise. If all "yes", move on to [[Learning/DSA/Graphs/SCC]] — the last graph subtopic.
 
 ## 🔗 Related
 
-- Up: [[Learning/DSA/Graphs]]
-- Prev: [[Learning/DSA/Graphs/MST]]
-- Companion prereqs: [[Learning/DSA/Priority-Queue]] (for Dijkstra), [[Learning/DSA/Graphs/Traversals]] (BFS)
-- Next: [[Learning/DSA/Graphs/SCC]]
-- Practice problems: [[Learning/DSA/Graphs/Exercises]]
+Up: [[Learning/DSA/Graphs]]
+
+Prev: [[Learning/DSA/Graphs/MST]]
+
+Companion prereqs: [[Learning/DSA/Priority-Queue]] (for Dijkstra), [[Learning/DSA/Graphs/Traversals]] (BFS)
+
+Next: [[Learning/DSA/Graphs/SCC]]
+
+Practice problems: [[Learning/DSA/Graphs/Exercises]]

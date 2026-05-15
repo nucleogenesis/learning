@@ -1,47 +1,50 @@
 ---
 title: Traversals
 tags: [learning, dsa, graphs, traversals, bfs, dfs]
-lastUpdated: 2026-05-14
+lastUpdated: 2026-05-15
 ---
-
 # Graph traversals — BFS & DFS
 
-The two atomic patterns. **Most graph algorithms are a BFS or DFS with extra bookkeeping.**
+> **Convention**: Answer blocks live as children of "Show answer" parents. Click the triangle to collapse — Logseq remembers the state.
 
-## Session warm-up (retrieval check-in)
+## 🎯 Why this matters
 
-Without scrolling, jot:
+Take three problems:
 
-- BFS uses a ___ data structure; DFS uses a ___ data structure.
-- Time complexity of plain BFS or DFS on a graph with `V` vertices and `E` edges?
-- One algorithm you'd build *on top of* BFS or DFS in upcoming subtopics?
+- **Six degrees of Kevin Bacon**: shortest chain of co-stars between any actor and Kevin Bacon.
+- **Maze solver**: find a path from entrance to exit on a grid.
+- **Dependency resolver**: install package A; it needs B and C; B needs D; install everything in the right order.
+  - Different problems, same atomic move: **visit every reachable vertex in a graph, in some order, without revisiting.** That's a traversal.
+  - There are two ways to do it, BFS and DFS, and which you pick depends on what you want to *do* during the visit. **Most graph algorithms — shortest paths, cycle detection, connected components, topological sort, strongly-connected components — are a BFS or DFS with some extra bookkeeping.** Get these two right and most of the rest of graphs falls out.
 
-Wrote something? Now read on.
+## A tiny worked example
 
-## Predict-first
+Same four-person social network from [[Learning/DSA/Graphs/Basics]]:
 
-**Before** seeing any pseudocode:
+```
+Alice ── Bob
+│       │
+Carol ── Dave
+```
 
-> *Suppose you have a maze represented as a graph. Each cell is a vertex; walls remove edges. You want the shortest path (fewest cells) from start to goal. Would you use BFS or DFS? Why?*
+As an adjacency list:
 
-Predict. (BFS, because layer-by-layer exploration guarantees first arrival is shortest in an unweighted graph — but commit your answer first.)
+```python
+graph = {
+  'Alice': ['Bob', 'Carol'],
+  'Bob':   ['Alice', 'Dave'],
+  'Carol': ['Alice', 'Dave'],
+  'Dave':  ['Bob', 'Carol'],
+}
+```
 
-## Cheat-sheet table
+Starting from `Alice`, we want to visit every reachable person exactly once.
 
-| | BFS | DFS |
-|---|---|---|
-| Data structure | FIFO queue | LIFO stack / recursion |
-| Discovery order | Level-by-level | Branch deep first |
-| Finds shortest path (unweighted)? | ✅ yes | ❌ no |
-| Detects cycle in directed graph? | hard | ✅ natural (with colors) |
-| Topological sort? | Kahn-style | post-order reverse |
-| SCC, bridges, articulation? | no | yes |
-| Memory (worst-case) | `O(V)` queue (wide graphs) | `O(V)` stack (deep graphs) |
-| Time | `O(V + E)` | `O(V + E)` |
+### BFS — layer by layer
 
-## BFS — breadth-first search
+Imagine ripples in water. Visit Alice's *immediate* friends first (layer 1: Bob, Carol), then *their* friends (layer 2: Dave), then we're done.
 
-### Worked example (read)
+The mechanism: a **FIFO queue**. Enqueue the start. Repeatedly dequeue the next vertex, visit it, and enqueue its unvisited neighbors. The FIFO discipline guarantees layer-order.
 
 ```python
 from collections import deque
@@ -49,26 +52,106 @@ from collections import deque
 def bfs(graph, start):
   visited = {start}
   queue = deque([start])
-  order = []
   while queue:
       v = queue.popleft()
-      order.append(v)
+      print(v)                          # "visit" v
+      for u in graph[v]:
+          if u not in visited:
+              visited.add(u)            # mark when *enqueueing*, not dequeueing
+              queue.append(u)
+```
+
+Running this from `Alice` prints: `Alice, Bob, Carol, Dave`. Bob and Carol — layer 1 — come out before Dave — layer 2.
+
+- **Why mark visited at enqueue time?** If you instead mark at dequeue time, multiple neighbors can enqueue the same vertex before it's dequeued, and the queue blows up to `O(E)` size on dense graphs. Mark on enqueue → queue never exceeds `O(V)`.
+- **Key BFS property**: the first time BFS reaches a vertex, it's reached by the shortest path (in number of edges). That's why BFS gives shortest paths on unweighted graphs — the layer it shows up in *is* the shortest distance.
+
+### DFS — go deep, then back up
+
+Picture exploring a maze: walk forward as far as you can, hit a dead end, back up to the last branch, try the other direction, repeat. Visit Alice; pick a neighbor, say Bob; from Bob pick a neighbor (other than Alice), say Dave; from Dave pick a neighbor (other than Bob), which is Carol; Carol's neighbors are all visited; back up.
+
+The mechanism: a **stack** — explicit, or implicit via recursion. Either way, the LIFO discipline gives depth-first behavior.
+
+Recursive:
+
+```python
+def dfs(graph, start, visited=None):
+  if visited is None:
+      visited = set()
+  visited.add(start)
+  print(start)
+  for u in graph[start]:
+      if u not in visited:
+          dfs(graph, u, visited)
+```
+
+Iterative (explicit stack):
+
+```python
+def dfs_iter(graph, start):
+  visited = {start}
+  stack = [start]
+  while stack:
+      v = stack.pop()
+      print(v)
       for u in graph[v]:
           if u not in visited:
               visited.add(u)
-              queue.append(u)
-  return order
+              stack.append(u)
 ```
 
-**Key invariant**: a vertex is marked visited the moment it's *enqueued*, not when popped. Otherwise the same vertex gets enqueued multiple times → wrong complexity.
+Running recursive DFS from `Alice` (neighbors in list order — Bob first): `Alice, Bob, Dave, Carol`.
 
-### Faded — fill in the blanks
+- **One non-obvious thing**: recursive DFS and iterative DFS visit the same *set* of vertices, but generally in **different orders**, because a stack processes children right-to-left while recursion goes left-to-right. If you need the iterative version to match the recursive one, reverse the neighbor iteration.
 
-BFS that returns the **shortest-distance dict** from `start` to every reachable vertex:
+### Naming the parts as they come up
+
+- **Visit order** (sometimes "discovery order"): the order vertices first get touched.
+- **Finish order** (DFS only, useful for topological sort): the order vertices *complete* their DFS subtree. In recursive DFS, finish-order is what you log when the recursive call *returns*, not when it enters.
+- **Pre-order / post-order**: pre-order = log on enter, post-order = log on return. Same idea as tree traversals; DFS is the graph generalization.
+- **Tree edge / back edge / forward edge / cross edge**: edge classifications based on the color of the neighbor when DFS first sees it. The important one is **back edge** — an edge to a vertex still on the recursion stack. In directed graphs, a back edge means a cycle.
+
+## BFS vs DFS — when each wins
+
+| | BFS | DFS |
+|---|---|---|
+| Data structure | FIFO queue | LIFO stack / recursion |
+| Visit order | Level-by-level | Branch deep first |
+| Finds shortest path (unweighted)? | ✅ yes | ❌ no |
+| Detects cycle in **directed** graph? | hard | ✅ DFS with white/gray/black |
+| Topological sort? | Kahn-style BFS | DFS post-order reversed |
+| Connected components | either works | either works |
+| SCC, bridges, articulation points | no | yes |
+| Worst-case memory | `O(V)` queue (wide graphs) | `O(V)` stack (deep graphs) |
+| Time | `O(V + E)` | `O(V + E)` |
+
+- **Heuristic for picking**:
+- "Shortest path on an unweighted graph?" → BFS.
+- "Are there any cycles?" (directed) → DFS with colors.
+- "Process X after all things X depends on are done?" → DFS post-order.
+- "Distance from many sources simultaneously?" → multi-source BFS.
+
+## 🔍 Quick check (try before scrolling)
+
+- **Q1**: Why does BFS find the shortest path on an *unweighted* graph but get it wrong on a weighted one?
+- Show answer to Q1
+  - BFS's layer-by-layer invariant only holds when every edge contributes the same to distance (i.e., weight 1). On a weighted graph, a path with more *edges* can still be shorter in total weight than a path with fewer edges. Example: A→B costs 100, A→C→B costs 2. BFS reaches B in one step (via A→B) and declares distance 1, missing the cheaper 2-edge route. For weighted shortest paths you want Dijkstra (non-negative) or Bellman-Ford (negative weights allowed).
+- **Q2**: In recursive DFS from `Alice` on our 4-person graph, in what order do vertices *finish* (post-order)?
+- Show answer to Q2
+  - Carol finishes first (no new neighbors when DFS hits her). Then Dave (Carol was his last unvisited neighbor). Then Bob (Dave was his last). Then Alice. Post-order: **Carol, Dave, Bob, Alice**. This is exactly the order a DFS-based topological sort would output in *reverse*.
+- **Q3**: You have a graph where weights are only 0 or 1 (e.g., an unweighted grid plus some "free moves" for distance 0). Plain BFS or something else?
+- Show answer to Q3
+  - Use **0-1 BFS** with a deque: push 0-weight neighbors to the *front*, 1-weight neighbors to the *back*. Stays `O(V + E)` and gives correct shortest paths. Plain BFS gets it wrong because it can't distinguish the two edge weights. (You'd save Dijkstra for graphs with arbitrary non-negative weights.)
+
+---
+
+## 💪 Practice (a separate session, not your first read)
+
+### Worked → faded → blank: BFS with distances
+
+#### Worked example (read)
 
 ```python
-from collections import deque
-
 def bfs_distances(graph, start):
   dist = {start: 0}
   queue = deque([start])
@@ -76,119 +159,63 @@ def bfs_distances(graph, start):
       v = queue.popleft()
       for u in graph[v]:
           if u not in dist:
-              # FILL: set u's distance based on v's distance
-              ____________________
-              # FILL: enqueue u for later exploration
-              ____________________
+              dist[u] = dist[v] + 1
+              queue.append(u)
   return dist
 ```
 
-(Take a guess before scrolling for the answer.)
+Notice `dist` doubles as the visited set — `u not in dist` is the existence check.
 
-<details><summary>Reveal</summary>
+#### Faded — fill in the blanks
 
-```python
-dist[u] = dist[v] + 1
-queue.append(u)
-```
-
-The dist dict doubles as the visited set — `u not in dist` is the existence check.
-
-</details>
-
-### From-scratch — no scaffold
-
-Write `bfs_path(graph, start, goal)` that returns a list `[start, ..., goal]` giving the shortest path, or `None` if unreachable. Hint: store `parent[u] = v` when you first discover `u`, then reconstruct by walking parents back from goal.
-
-### Trace-the-path
-
-Graph (undirected adjacency list):
-
-```
-A: [B, C]
-B: [A, D, E]
-C: [A, F]
-D: [B]
-E: [B, F]
-F: [C, E]
-```
-
-Run BFS from `A`. **Predict the order before scrolling.** What's in the queue at each step?
-
-<details><summary>Reveal</summary>
-
-```
-Step 0: visited={A},          queue=[A]
-Pop A. Neighbors B, C → enqueue both.
-Step 1: visited={A,B,C},      queue=[B,C]
-Pop B. Neighbors D, E → enqueue both (A already visited).
-Step 2: visited={A,B,C,D,E},  queue=[C,D,E]
-Pop C. Neighbor F → enqueue (A already visited).
-Step 3: visited={A,B,C,D,E,F},queue=[D,E,F]
-Pop D, E, F (no new neighbors).
-Order: A, B, C, D, E, F
-```
-
-The crucial property: F is discovered at distance 2 via C (which has distance 1). Anything BFS reaches in step `k` has shortest distance `k`.
-
-</details>
-
-### Variants
-
-- **0-1 BFS**: weights are only 0 or 1 → use a deque, push 0-edges to front. `O(V + E)`.
-- **Multi-source BFS**: seed the queue with multiple starts at distance 0 (e.g. "nearest 0" type problems).
-- **Bidirectional BFS**: search from start and goal simultaneously → much faster on huge graphs.
-
-### Flashcards — BFS
-
-- BFS time complexity? #card
-  - `O(V + E)`
-- Why mark visited at **enqueue** time, not dequeue time? #card
-  - To prevent the same vertex from being added to the queue multiple times by different neighbors before it's dequeued. Otherwise complexity degrades.
-- When does BFS find the shortest path? #card
-  - On **unweighted** (or uniformly-weighted) graphs. The first time a vertex is reached, that's the minimum edge count.
-- {{cloze BFS uses a **FIFO queue**; DFS uses a **LIFO stack**.}} #card
-- What problem class is **multi-source BFS** ideal for? #card
-  - "Distance to the nearest X" — seed the queue with all Xs at distance 0 and let BFS spread.
-
-## DFS — depth-first search
-
-### Worked example: recursive
+`bfs_path(graph, start, goal)` returning the shortest path as a list `[start, ..., goal]`, or `None`:
 
 ```python
-def dfs(graph, start, visited=None):
-  if visited is None:
-      visited = set()
-  visited.add(start)
-  order = [start]
-  for u in graph[start]:
-      if u not in visited:
-          order.extend(dfs(graph, u, visited))
-  return order
-```
-
-### Worked example: iterative (explicit stack)
-
-```python
-def dfs_iter(graph, start):
-  visited = {start}
-  stack = [start]
-  order = []
-  while stack:
-      v = stack.pop()
-      order.append(v)
+def bfs_path(graph, start, goal):
+  parent = {start: None}
+  queue = deque([start])
+  while queue:
+      v = queue.popleft()
+      if v == goal:
+          # FILL: reconstruct the path by walking parents
+          ____________________
+          ____________________
+          return path
       for u in graph[v]:
-          if u not in visited:
-              visited.add(u)
-              stack.append(u)
-  return order
+          if u not in parent:
+              # FILL: record that we reached u from v
+              ____________________
+              queue.append(u)
+  return None
 ```
 
-**Heads up**: iterative DFS that "marks on push" gives the same visited *set* but a different *order* — recursive explores children left-to-right, iterative pops them right-to-left because of the stack. Reverse the neighbor iteration if you need to match.
+- Show the answer
 
-### Faded — fill in the blanks
+```python
 
-DFS with white-gray-black coloring for **directed cycle detection**:
+# reconstruction:
+
+- path = []
+- while v is not None:
+- path.append(v)
+- v = parent[v]
+- return list(reversed(path))
+
+```
+- ```python
+  # recording the predecessor:
+  parent[u] = v
+  ```
+
+The trick is that `parent` doubles as the visited set: `u not in parent` is the existence check. Walking parents back from the goal gives you the path in reverse, then you reverse it.
+
+#### From scratch
+
+Write `bfs_levels(graph, start) -> dict[V, list[V]]` returning a dict from level number to the list of vertices at that level. Test on our 4-person graph from `Alice`: expected `{0: ['Alice'], 1: ['Bob', 'Carol'], 2: ['Dave']}`.
+
+### Worked → faded → blank: DFS with directed cycle detection
+
+#### Worked example (read)
 
 ```python
 WHITE, GRAY, BLACK = 0, 1, 2
@@ -200,71 +227,74 @@ def has_cycle(graph):
       color[v] = GRAY
       for u in graph[v]:
           if color[u] == GRAY:
-              # FILL: what does seeing a GRAY neighbor mean?
-              return ____
+              return True              # back edge → cycle
           if color[u] == WHITE and visit(u):
               return True
-      # FILL: mark v's color now that we're done with it
-      ____________________
+      color[v] = BLACK
       return False
 
   return any(color[v] == WHITE and visit(v) for v in graph)
 ```
 
-<details><summary>Reveal</summary>
+The three colors track DFS state: WHITE = untouched, GRAY = currently on the recursion stack, BLACK = fully explored. A neighbor that's still GRAY when we look at it is an ancestor in the DFS tree — i.e., a back edge — i.e., a cycle.
+
+#### Faded — fill in the blanks
+
+Adapt the algorithm to also **return one of the cycles** (a list of vertices forming a directed cycle), not just a yes/no:
 
 ```python
-return True            # GRAY means back-edge → cycle
-color[v] = BLACK       # done exploring v's subtree
+def find_cycle(graph):
+  color = {v: WHITE for v in graph}
+  parent = {}
+
+  def visit(v):
+      color[v] = GRAY
+      for u in graph[v]:
+          if color[u] == GRAY:
+              # FILL: reconstruct the cycle from u back to v, then forward to u
+              ____________________
+              ____________________
+              return cycle
+          if color[u] == WHITE:
+              parent[u] = v
+              result = visit(u)
+              if result is not None:
+                  return result
+      color[v] = BLACK
+      return None
+
+  for v in graph:
+      if color[v] == WHITE:
+          result = visit(v)
+          if result is not None:
+              return result
+  return None
 ```
 
-</details>
+- Show the answer
 
-### From-scratch
+```python
 
-Implement `dfs_postorder(graph, start)` returning vertices in DFS post-order (the order they *finish*, not the order they're discovered). This is the building block for topological sort.
+- cycle = [u]
+- cur = v
+- while cur != u:
+- cycle.append(cur)
+- cur = parent[cur]
+- cycle.append(u)
+- return list(reversed(cycle))
 
-### Trace-the-path
+```
+- When you see a back edge `v → u` where `u` is GRAY (on the stack), the cycle is `u → ... → v → u`. Walk parents back from `v` to `u`, then close the loop with `u`. Reverse for the natural direction.
 
-Same graph as the BFS trace. Run **recursive** DFS from `A`, iterating neighbors in alphabetical order. **Predict the visit order before checking.**
+#### From scratch
 
-<details><summary>Reveal</summary>
+Implement `dfs_postorder(graph, start) -> list[V]` — vertices in DFS finish order. This is the building block of topological sort.
 
-`A → B → D → (back to B) → E → F → (back to E, B, A) → C → (C's neighbors A, F both visited)`
+### Debug-this
 
-Visit order: **A, B, D, E, F, C**
+Three plausible-looking but buggy snippets. **Predict the failure mode before revealing.**
 
-Notice how DFS dives deep along the A→B→D branch before backtracking, whereas BFS swept level-by-level.
-
-</details>
-
-### Edge classifications (during DFS)
-
-- **Tree edge**: edge to a WHITE vertex.
-- **Back edge**: edge to a GRAY vertex (ancestor in DFS tree). Indicates cycle in directed graph; in undirected, ignore the immediate parent.
-- **Forward edge**: edge to a BLACK descendant (directed only).
-- **Cross edge**: edge to a BLACK vertex that is not a descendant (directed only).
-
-### Flashcards — DFS
-
-- DFS time complexity? #card
-  - `O(V + E)`
-- DFS space complexity in the worst case? #card
-  - `O(V)` — recursion depth (or explicit stack size) can grow to the longest path.
-- In **directed** cycle detection, the key DFS state is... #card
-  - Three colors: WHITE (unvisited), GRAY (on current recursion stack), BLACK (fully explored). A GRAY neighbor means a back edge → cycle.
-- Why is **immediate-parent** ignored when detecting cycles in **undirected** DFS? #card
-  - Every undirected edge appears in both directions; revisiting the parent isn't a true back edge.
-- {{cloze A **back edge** during DFS is an edge to a vertex currently in the recursion stack (GRAY).}} #card
-- Edge type from a BLACK descendant (only meaningful in directed DFS)? #card
-  - **Forward edge**.
-- {{cloze Recursive DFS and stack-based iterative DFS visit the same set of vertices, but produce **different** visit orders because the stack reverses neighbor processing.}} #card
-
-## Debug-this
-
-Each snippet below tries to do something specific. Predict the bug *before* revealing.
-
-### A) BFS that "marks on dequeue"
+#### A) BFS that "marks on dequeue"
 
 ```python
 def bfs_buggy(graph, start):
@@ -279,15 +309,10 @@ def bfs_buggy(graph, start):
           queue.append(u)
 ```
 
-What's wrong, and what real-world consequence does it have?
+- Show the bug
+  - It still produces the correct visit set, but the queue grows to `O(E)` instead of `O(V)`. On a dense graph (`E ≈ V²`) the same vertex can be enqueued by every neighbor before it's dequeued, so memory blows up. **The fix**: mark visited at enqueue time, not dequeue time. Then no vertex is ever enqueued twice.
 
-<details><summary>Reveal</summary>
-
-It still works correctly (visits each vertex once), but the queue can grow to `O(E)` instead of `O(V)` because the same vertex can be enqueued from many neighbors before it's dequeued. On dense graphs that's a real memory blowup. The fix: mark visited at enqueue time so we never enqueue the same vertex twice.
-
-</details>
-
-### B) Recursive DFS on a graph with cycles
+#### B) Recursive DFS with no visited set, on a graph with a cycle
 
 ```python
 def dfs(graph, start):
@@ -295,15 +320,10 @@ def dfs(graph, start):
       dfs(graph, u)
 ```
 
-What happens on `graph = {'A': ['B'], 'B': ['A']}`?
+- Show the bug
+  - Infinite recursion on any graph that has a cycle. With `{'A': ['B'], 'B': ['A']}`, DFS bounces A→B→A→B→... until the stack overflows. Always carry a visited set.
 
-<details><summary>Reveal</summary>
-
-Infinite recursion — there's no `visited` set, and a cycle sends DFS back and forth between A and B until the stack overflows.
-
-</details>
-
-### C) Undirected cycle detection using GRAY/BLACK
+#### C) Undirected cycle detection using WHITE/GRAY/BLACK
 
 ```python
 def has_cycle_undirected(graph):
@@ -320,62 +340,65 @@ def has_cycle_undirected(graph):
   return any(color[v] == WHITE and visit(v) for v in graph)
 ```
 
-Why does this **falsely report a cycle** on `{'A': ['B'], 'B': ['A']}`?
+- Show the bug
+  - Reports a false cycle on any non-trivial undirected graph. Reason: every undirected edge appears in both directions in the adjacency list. When DFS goes A→B, looking at B's neighbors it sees A, which is GRAY (still on the stack), and falsely declares a back edge. **Fix**: pass the parent vertex and skip it: `visit(u, parent=v)` and ignore `u == parent` when checking GRAY neighbors. Or just use **Union-Find** for undirected cycle detection — it's simpler.
 
-<details><summary>Reveal</summary>
+### Teach-it-back
 
-In an undirected graph every edge appears in both directions in the adjacency list. When DFS goes A→B, the recursive call sees A in B's neighbor list and A is still GRAY (in the recursion stack), so it reports a cycle. For undirected graphs you must pass the *parent* and skip it: `visit(u, parent=v)` and `if u != parent and color[u] == GRAY: return True`. Or just use **Union-Find** for undirected cycle detection — it's simpler.
+Without notes, answer in ~4 sentences:
 
-</details>
+> *"Why does BFS find shortest paths on unweighted graphs but not on weighted graphs? Construct a counterexample — a tiny weighted graph where BFS gives the wrong answer — and explain what algorithm you'd use instead."*
 
-## Trace + predict-first combo (interleaving)
+If you can't construct the counterexample, the BFS invariant ("first arrival is shortest") hasn't fully clicked. Re-read the BFS section, then try again.
 
-Same graph, three questions — mix BFS and DFS reasoning. Answer each before scrolling.
+---
 
-Graph:
+## 🎴 Flashcards (for daily review, not the first read)
 
-```
-1: [2, 3]
-2: [1, 4]
-3: [1, 4]
-4: [2, 3, 5]
-5: [4]
-```
+- BFS time complexity? #card
+  - `O(V + E)`.
+- DFS time complexity? #card
+  - `O(V + E)`.
+- BFS data structure? #card
+  - FIFO queue.
+- DFS data structure? #card
+  - LIFO stack (explicit, or implicit via recursion).
+- When does BFS find the shortest path? #card
+  - Unweighted (or uniformly-weighted) graphs. First arrival = shortest distance.
+- Why mark visited at **enqueue** time in BFS, not dequeue time? #card
+  - To prevent the same vertex being enqueued multiple times by different neighbors. Without this, queue size grows to `O(E)` instead of `O(V)`.
+- {{cloze BFS uses a **FIFO queue**; DFS uses a **LIFO stack**.}} #card
+- What is a **back edge** in DFS? #card
+  - An edge to a vertex currently on the recursion stack (GRAY). In a directed graph, a back edge means a cycle.
+- In directed cycle detection, what do WHITE/GRAY/BLACK mean? #card
+  - WHITE = unvisited. GRAY = currently being explored (on recursion stack). BLACK = fully explored. Seeing a GRAY neighbor = back edge = cycle.
+- Why doesn't WHITE/GRAY/BLACK work directly for undirected cycle detection? #card
+  - Every undirected edge appears in both directions, so the parent always looks like a GRAY neighbor. Fix: skip the parent vertex explicitly, or use Union-Find instead.
+- What's **multi-source BFS** good for? #card
+  - "Distance to the nearest X." Seed the queue with all Xs at distance 0; BFS spreads outward simultaneously from all of them.
+- How does DFS-based topological sort produce the order? #card
+  - Run DFS over all vertices, push each onto a stack when it *finishes* (post-order). Pop the stack at the end — that's the topological order.
+- {{cloze Recursive DFS and iterative DFS visit the same vertices, but in **different** orders because a stack reverses neighbor processing.}} #card
 
-1. What's the BFS distance from 1 to 5?
-2. In recursive DFS from 1 (neighbors in numeric order), in what order are vertices *first discovered*?
-3. In the same DFS, in what order are vertices *finished* (post-order)?
+---
 
-<details><summary>Reveal</summary>
+## ✅ Self-check before moving on
 
-1. `2` (1 → 2 or 3 → 4 → 5 is length 3; wait, no: BFS distance is edge count, 1→2 is 1, 1→2→4 is 2, 1→2→4→5 is 3). Actually the answer is **3**. Slow down here — BFS distance equals shortest *number of edges*, not number of vertices visited.
-2. Discovery order: `1, 2, 4, 3 (back from 4 to 3? no — 3 is a neighbor of 4, so from 4 we go to 3, which is WHITE), 5`. Wait — when DFS is at 4, neighbors in numeric order are [2, 3, 5]. 2 is already visited, so we recurse into 3. From 3 neighbors are [1, 4] — both visited. Return to 4, then recurse into 5. Final: **1, 2, 4, 3, 5**.
-3. Post-order (finish order): 3 finishes first (no new neighbors), then 5, then 4, then 2, then 1. Result: **3, 5, 4, 2, 1**.
+Honest yes/no:
 
-If you got #2 or #3 wrong, that's exactly the kind of subtle ordering that bites you in topological sort. Worth tracing on paper.
+Can I write BFS from scratch (without notes) and explain why "mark visited at enqueue" matters?
 
-</details>
+Can I write recursive DFS *and* iterative DFS, and explain when their visit orders differ?
 
-## Teach-it-back
+Can I explain the white/gray/black trick and what a back edge is?
 
-Without notes, write a 4–5 sentence explanation of:
+Can I name three problems that reduce to BFS/DFS with extra bookkeeping?
 
-> *"Why does BFS find shortest paths on unweighted graphs but not weighted graphs? Give an example of a weighted graph where BFS would get the wrong answer."*
+If any "no", do one practice exercise. If all "yes", move on to [[Learning/DSA/Graphs/Connectivity]].
 
-If you can't construct the counterexample, that's a signal that the BFS invariant ("first arrival is shortest") hasn't fully clicked.
-
-## Metacognition checkpoint
-
-- I can write BFS from scratch without looking: __ / 5
-- I can write recursive DFS *and* iterative DFS without looking: __ / 5
-- I understand why iterative DFS can produce a different order than recursive: __ / 5
-- I can explain the white-gray-black trick well enough to debug a cycle-detection bug: __ / 5
-
-One thing to revisit next session: ______
-
-## Related
+## 🔗 Related
 
 - Up: [[Learning/DSA/Graphs]]
 - Prev: [[Learning/DSA/Graphs/Basics]]
 - Next: [[Learning/DSA/Graphs/Connectivity]]
-- Exercises: [[Learning/DSA/Graphs/Exercises]]
+- Practice problems: [[Learning/DSA/Graphs/Exercises]]

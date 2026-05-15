@@ -1,9 +1,8 @@
 ---
 title: Topological-Sort
-tags: [learning, dsa, graphs, topological-sort]
+tags: [learning, dsa, graphs, topological-sort, dag]
 lastUpdated: 2026-05-15
 ---
-
 # Topological sort — ordering a DAG
 
 > Convention: Answer blocks are children of "Show answer" parents. Click the triangle to collapse — Logseq remembers.
@@ -21,8 +20,7 @@ That's **topological sort**: given a directed acyclic graph (DAG), produce a lin
 - **Spreadsheet recalculation**: when cell A1 changes, recompute cells in dependency order.
 - **Course prerequisites**: figure out a valid semester-by-semester course plan.
 - **Symbol resolution in compilers**: process forward declarations before uses.
-
-**Hard prerequisite**: the graph must be a DAG. If there's a cycle, no valid ordering exists. Both algorithms below also serve as cycle detectors — they signal failure if the input has a cycle.
+  - **Hard prerequisite**: the graph must be a DAG. If there's a cycle, no valid ordering exists. Both algorithms below also serve as cycle detectors — they signal failure if the input has a cycle.
 
 ## A tiny worked example
 
@@ -48,14 +46,15 @@ graph = {
 
 Several valid topological orderings exist:
 
-- `boil_water, chop_garlic, cook_pasta, make_sauce, serve`
-- `chop_garlic, make_sauce, boil_water, cook_pasta, serve`
-- `boil_water, chop_garlic, make_sauce, cook_pasta, serve`
+`boil_water, chop_garlic, cook_pasta, make_sauce, serve`
+
+`chop_garlic, make_sauce, boil_water, cook_pasta, serve`
+
+`boil_water, chop_garlic, make_sauce, cook_pasta, serve`
 
 All of them respect every dependency arrow. Toposort never has a unique answer in general — it's a *family* of orderings consistent with the DAG.
 
-**Naming the parts**:
-
+- **Naming the parts**:
 - **DAG** — directed acyclic graph. Required input.
 - **Source** — a vertex with in-degree 0. No prerequisites. `boil_water` and `chop_garlic` are sources.
 - **Sink** — a vertex with out-degree 0. Nothing depends on it. `serve` is the only sink here.
@@ -97,7 +96,7 @@ def topo_sort_kahn(graph):
 
 Time: `O(V + E)`. Space: `O(V)` for in-degree counts plus queue.
 
-**Cycle detection comes free**: if the graph has a cycle, the vertices on the cycle never reach in-degree 0, so they never enter the queue, so `len(order) < len(graph)`.
+- **Cycle detection comes free**: if the graph has a cycle, the vertices on the cycle never reach in-degree 0, so they never enter the queue, so `len(order) < len(graph)`.
 
 ### DFS post-order — reversed
 
@@ -128,7 +127,7 @@ def topo_sort_dfs(graph):
 
 Time: `O(V + E)`. Space: `O(V)` for the colors plus recursion stack.
 
-**Cycle detection**: same white/gray/black machinery from [[Learning/DSA/Graphs/Traversals]]. A back edge (to a GRAY vertex) means a cycle, and we abort.
+- **Cycle detection**: same white/gray/black machinery from [[Learning/DSA/Graphs/Traversals]]. A back edge (to a GRAY vertex) means a cycle, and we abort.
 
 ### Kahn vs DFS — when each wins
 
@@ -140,7 +139,7 @@ Time: `O(V + E)`. Space: `O(V)` for the colors plus recursion stack.
 | Lexicographically smallest order easy? | use a min-heap instead of queue → ✅ | hard |
 | Yields source-first ordering | yes (sources come out first) | yes (sources come out first when reversed) |
 
-**Default pick**: Kahn's, slightly. Iterative, easy to extend (e.g., for lexicographic toposort or for parallel-friendly "do everything at depth 0, then everything at depth 1" scheduling). DFS post-order is conceptually elegant and reuses cycle-detection code you already wrote for Traversals.
+- **Default pick**: Kahn's, slightly. Iterative, easy to extend (e.g., for lexicographic toposort or for parallel-friendly "do everything at depth 0, then everything at depth 1" scheduling). DFS post-order is conceptually elegant and reuses cycle-detection code you already wrote for Traversals.
 
 ## 🔍 Quick check (try before scrolling)
 
@@ -203,12 +202,18 @@ def topo_layers(graph):
 ```
 
 - Show the answer
-  - ```python
-    for u in graph[v]:
-        in_degree[u] -= 1
-        if in_degree[u] == 0:
-            next_layer.append(u)
-    ```
+
+```python
+
+- for u in graph[v]:
+
+in_degree[u] -= 1
+
+- if in_degree[u] == 0:
+
+next_layer.append(u)
+
+```
   - The outer while-loop now processes a whole layer at a time. Each layer is the set of tasks you could run in parallel given infinite workers. On the pasta graph, layers would be `[[boil_water, chop_garlic], [cook_pasta, make_sauce], [serve]]`.
 
 #### From scratch
@@ -219,25 +224,24 @@ Write `topo_sort_dfs(graph)` from a blank file, including cycle detection. Test 
 
 ```python
 def topo_buggy(graph):
-   visited = set()
-   order = []
+    visited = set()
+    order = []
 
-   def visit(v):
-       if v in visited:
-           return
-       visited.add(v)
-       for u in graph[v]:
-           visit(u)
-       order.append(v)
+    def visit(v):
+        if v in visited:
+            return
+        visited.add(v)
+        for u in graph[v]:
+            visit(u)
+        order.append(v)
 
-   for v in graph:
-       visit(v)
+    for v in graph:
+        visit(v)
 
-   return order   # ← suspicious
+    return order   # ← suspicious
 ```
 
-What's wrong? Predict before revealing.
-
+- What's wrong? Predict before revealing.
 - Show the bugs
   - **Bug 1**: Missing the final `reversed()`. DFS post-order is *reverse* topological order; you need to reverse the list before returning.
   - **Bug 2**: No cycle detection. With only a single `visited` set (no GRAY/BLACK distinction), the function silently produces an invalid ordering on cyclic input instead of raising. Try it on `{'a': ['b'], 'b': ['a']}` — it'll happily emit `['a', 'b']` or `['b', 'a']` despite no valid toposort existing.
@@ -278,18 +282,19 @@ If you can't explain both halves cleanly, that's a signal to re-trace the post-o
 
 ## ✅ Self-check before moving on
 
-Honest yes/no:
-
+- Honest yes/no:
 - Can I write Kahn's algorithm from scratch, including cycle detection?
 - Can I explain why DFS finishing order is *reverse* topological order?
 - Can I run either algorithm by hand on a 5-vertex DAG and predict the output?
 - Do I know one real-world use case I'd reach for toposort on?
-
-If any "no", do one practice exercise. If all "yes", move on to [[Learning/DSA/Disjoint-Set-Union]] (prereq for the next pair of subtopics).
+  - If any "no", do one practice exercise. If all "yes", move on to [[Learning/DSA/Disjoint-Set-Union]] (prereq for the next pair of subtopics).
 
 ## 🔗 Related
 
-- Up: [[Learning/DSA/Graphs]]
-- Prev: [[Learning/DSA/Graphs/Connectivity]]
-- Next: [[Learning/DSA/Disjoint-Set-Union]] (prereq for MST), then [[Learning/DSA/Graphs/Shortest-Paths]]
-- Practice problems: [[Learning/DSA/Graphs/Exercises]]
+Up: [[Learning/DSA/Graphs]]
+
+Prev: [[Learning/DSA/Graphs/Connectivity]]
+
+Next: [[Learning/DSA/Disjoint-Set-Union]] (prereq for MST), then [[Learning/DSA/Graphs/Shortest-Paths]]
+
+Practice problems: [[Learning/DSA/Graphs/Exercises]]

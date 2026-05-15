@@ -1,14 +1,13 @@
 ---
 title: Basics
 tags: [learning, dsa, graphs, basics]
-lastUpdated: 2026-05-14
+lastUpdated: 2026-05-15
 ---
-
 # Graphs — basics & representations
 
 > **Convention on this page**: Answer blocks live as children of a parent "Show answer" bullet. To hide them, click the triangle on that parent once — Logseq remembers the collapsed state.
 
-## Why this matters
+## 🎯 Why this matters
 
 You're on a social network. You and a friend have a few hundred mutual followers, and some of those followers follow each other. Three questions immediately follow: *who's the most-connected person in this circle? Who's connected to nobody? Who's the bridge that holds two disjoint groups together?*
 
@@ -30,10 +29,8 @@ Carol ── Dave
 - Alice ↔ Carol
 - Bob ↔ Dave
 - Carol ↔ Dave
-
-We call Alice/Bob/Carol/Dave the **vertices** (or *nodes*) — the things. We call each mutual-follow link an **edge** — a relationship between two things. Together, vertices + edges form a **graph**.
-
-Formally: a graph is a pair `(V, E)` where `V` is a set of vertices and `E ⊆ V × V` is a set of edges. That formal definition is useful later; for now the picture above is enough.
+  - We call Alice/Bob/Carol/Dave the **vertices** (or *nodes*) — the things. We call each mutual-follow link an **edge** — a relationship between two things. Together, vertices + edges form a **graph**.
+  - Formally: a graph is a pair `(V, E)` where `V` is a set of vertices and `E ⊆ V × V` is a set of edges. That formal definition is useful later; for now the picture above is enough.
 
 ### Naming the parts as they come up
 
@@ -43,9 +40,7 @@ A few terms emerge naturally from this example:
 - **Path**: a sequence of edges joining two vertices without repeating any vertex. `Alice → Bob → Dave` is a path of length 2.
 - **Cycle**: a path that returns to its start. `Alice → Bob → Dave → Carol → Alice` is a cycle.
 - **Undirected** (our example): edges have no direction. **Directed**: edges have a from-vertex and a to-vertex; "Alice follows Bob" doesn't imply "Bob follows Alice."
-
-You'll occasionally need a few more terms — don't memorize them yet, they'll come up in context:
-
+  - You'll occasionally need a few more terms — don't memorize them yet, they'll come up in context:
 - **DAG** — directed graph with no cycles. Foundation for dependency resolution and topological sort.
 - **Tree** — connected, undirected, no cycles. Exactly `|V| − 1` edges.
 - **Forest** — a disjoint union of trees.
@@ -73,8 +68,7 @@ graph = {
 - **Space**: `O(V + E)` — each vertex once, each edge twice (undirected) or once (directed).
 - **"Are u and v connected?"**: `O(deg(u))` — scan u's neighbor list.
 - **"Who are u's neighbors?"**: `O(deg(u))` — just read the list.
-
-**The default choice** for most real-world graphs. Real-world graphs are usually *sparse* (`E ≪ V²`), so we don't want to pay `O(V²)` space.
+  - **The default choice** for most real-world graphs. Real-world graphs are usually *sparse* (`E ≪ V²`), so we don't want to pay `O(V²)` space.
 
 ### 2. Adjacency matrix
 
@@ -93,12 +87,11 @@ M = [
 - **Space**: `O(V²)`, regardless of how many edges exist.
 - **"Are u and v connected?"**: `O(1)` — just look up `M[u][v]`.
 - **"Who are u's neighbors?"**: `O(V)` — scan an entire row.
-
-Wins when the graph is **dense** (`E ≈ V²`) or when you need very fast edge-existence queries (e.g., the Floyd-Warshall shortest-path algorithm).
+  - Wins when the graph is **dense** (`E ≈ V²`) or when you need very fast edge-existence queries (e.g., the Floyd-Warshall shortest-path algorithm).
 
 ### 3. Edge list
 
-Just a list of `(u, v)` (or `(u, v, weight)`) tuples.
+- Just a list of `(u, v)` (or `(u, v, weight)`) tuples.
 
 ```python
 edges = [
@@ -112,8 +105,7 @@ edges = [
 - **Space**: `O(E)`.
 - **"Are u and v connected?"**: `O(E)` — scan the list.
 - **"Who are u's neighbors?"**: `O(E)` — scan again.
-
-Bad for traversal, but **the natural shape for Kruskal's MST algorithm**, which wants to iterate edges sorted by weight.
+  - Bad for traversal, but **the natural shape for Kruskal's MST algorithm**, which wants to iterate edges sorted by weight.
 
 ## Pick the right one — quick lookup
 
@@ -125,7 +117,7 @@ Bad for traversal, but **the natural shape for Kruskal's MST algorithm**, which 
 | Need to iterate edges by weight (Kruskal) | Edge list |
 | Just starting out, don't know yet | Adjacency list |
 
-## Quick check (try before scrolling)
+## 🔍 Quick check (try before scrolling)
 
 Two short questions to confirm the ideas above landed. Commit an answer in your head before expanding the children.
 
@@ -135,12 +127,11 @@ Two short questions to confirm the ideas above landed. Commit an answer in your 
 - **Q2**: Convert this edge list to an undirected adjacency list by hand: `[(1,2), (1,3), (2,4), (3,4), (4,5)]`.
 - Show answer to Q2
   - `{1: [2, 3], 2: [1, 4], 3: [1, 4], 4: [2, 3, 5], 5: [4]}`. Each edge `(u, v)` becomes `u` in `v`'s list *and* `v` in `u`'s list, because undirected.
-
-If both clicked, you've got the core ideas. Move to practice when you have time — it's a separate cognitive task and doesn't need to happen now.
+  - If both clicked, you've got the core ideas. Move to practice when you have time — it's a separate cognitive task and doesn't need to happen now.
 
 ---
 
-## Practice (a separate session, not your first read)
+## 💪 Practice (a separate session, not your first read)
 
 These exercises are for *after* you've sat with the ideas above. Don't try to do them in the same session as your first read — that's cramming.
 
@@ -168,11 +159,15 @@ def add_edge(graph, u, v):
 ```
 
 - Show the answer
-  - ```python
-    graph[u].append(v)
-    graph[v].append(u)
-    ```
-  - The symmetry of those two lines *is* the undirected-ness of the graph.
+
+```python
+
+graph[u].append(v)
+
+graph[v].append(u)
+
+```
+- The symmetry of those two lines *is* the undirected-ness of the graph.
 
 #### From scratch (no scaffold)
 
@@ -205,7 +200,7 @@ If you can't, the trade-offs table didn't land. Re-read it, then try again.
 
 ---
 
-## Flashcards (for daily review, not the first read)
+## 🎴 Flashcards (for daily review, not the first read)
 
 These get surfaced automatically by Logseq's flashcard queue. **Don't drill them on your first read of this page** — cramming on the same day you encoded the material is what the spacing effect specifically warns against. They show up in your queue tomorrow; drill them then.
 
@@ -231,17 +226,19 @@ These get surfaced automatically by Logseq's flashcard queue. **Don't drill them
 
 ---
 
-## Self-check before moving on
+## ✅ Self-check before moving on
 
 Honest yes/no — no fractions:
 
-- Can I draw a 5-vertex graph and write down its adjacency list, adjacency matrix, and edge list **without looking anything up**?
-- Can I name which representation to pick for a given problem and justify it in one sentence?
-- Could I explain in plain language why adjacency list is the default choice?
+Can I draw a 5-vertex graph and write down its adjacency list, adjacency matrix, and edge list **without looking anything up**?
+
+Can I name which representation to pick for a given problem and justify it in one sentence?
+
+Could I explain in plain language why adjacency list is the default choice?
 
 If any "no", do *one* practice exercise above. If all "yes", move on to [[Learning/DSA/Graphs/Traversals]].
 
-## Related
+## 🔗 Related
 
 - Up: [[Learning/DSA/Graphs]]
 - Next: [[Learning/DSA/Graphs/Traversals]]
