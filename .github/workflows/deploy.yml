@@ -35,6 +35,9 @@ jobs:
       - name: Build Quartz
         run: npx quartz build
 
+      - name: Build Anki decks
+        run: npx tsx scripts/build-anki.ts
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -27,3 +27,6 @@ jobs:
 
       - name: Build Quartz
         run: npx quartz build
+
+      - name: Build Anki decks
+        run: npx tsx scripts/build-anki.ts
