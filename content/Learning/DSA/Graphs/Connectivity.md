@@ -3,7 +3,6 @@ title: Connectivity
 tags: [learning, dsa, graphs, connectivity]
 lastUpdated: 2026-05-15
 ---
-
 # Connectivity — components, cycles, bipartite
 
 > Convention: Answer blocks are children of "Show answer" parents. Click the triangle to collapse — Logseq remembers.
@@ -15,8 +14,7 @@ Once you can traverse a graph (BFS/DFS), three immediate questions follow:
 - **"How many separate clusters are in my network?"** — a social network with 10M users probably contains a handful of disjoint communities; the Facebook graph is famously one giant component plus a long tail of small ones.
 - **"Will my build/install graph deadlock?"** — `npm`, `cargo`, `apt` all need to detect when package dependencies form a cycle. A cycle means "no valid install order exists."
 - **"Can these students be split into two teams so no two friends end up on the same team?"** — graph 2-colorability, also known as bipartite checking. Comes up in conflict resolution, job-shop scheduling, and matching problems.
-
-All three questions are tiny extensions of BFS/DFS. You walk the graph, you carry a little extra state (a component label, a coloring, a parent pointer), and the answer falls out.
+  - All three questions are tiny extensions of BFS/DFS. You walk the graph, you carry a little extra state (a component label, a coloring, a parent pointer), and the answer falls out.
 
 ## A tiny worked example
 
@@ -75,7 +73,7 @@ Running this on the example: `[['Alice', 'Bob', 'Carol', 'Dave'], ['Eve', 'Frank
 
 Time: `O(V + E)` — each vertex and each edge touched once across all the BFS/DFS calls combined.
 
-**Naming the parts**: a **connected component** is a maximal set of vertices where every pair has a path between them. "Maximal" matters: `{Alice, Bob}` is connected, but it's not a component because we can extend it to include Carol and Dave.
+- **Naming the parts**: a **connected component** is a maximal set of vertices where every pair has a path between them. "Maximal" matters: `{Alice, Bob}` is connected, but it's not a component because we can extend it to include Carol and Dave.
 
 Note: for **directed** graphs the right concept is **strongly connected components** (SCC), which need a more sophisticated algorithm — see [[Learning/DSA/Graphs/SCC]].
 
@@ -112,9 +110,11 @@ Time: `O(V + E)`.
 
 If you already have a DSU structure handy (see [[Learning/DSA/Disjoint-Set-Union]] — needed for Kruskal's MST anyway), undirected cycle detection is almost free:
 
-- Process each edge `(u, v)` in any order.
-- If `find(u) == find(v)`, the endpoints are already in the same component → adding this edge creates a cycle.
-- Otherwise, `union(u, v)`.
+Process each edge `(u, v)` in any order.
+
+If `find(u) == find(v)`, the endpoints are already in the same component → adding this edge creates a cycle.
+
+Otherwise, `union(u, v)`.
 
 ```python
 def has_cycle_dsu(vertices, edges):
@@ -128,7 +128,7 @@ def has_cycle_dsu(vertices, edges):
 
 Time: `O(E · α(V))` — effectively `O(E)` for practical input sizes.
 
-**When to pick which**: if you're already doing Kruskal's MST or similar, use DSU. Otherwise, the DFS approach is one less data structure to import.
+- **When to pick which**: if you're already doing Kruskal's MST or similar, use DSU. Otherwise, the DFS approach is one less data structure to import.
 
 ## Cycle detection — directed graphs
 
@@ -261,10 +261,14 @@ def size_of_each_component(graph):
 ```
 
 - Show the answer
-  - ```python
-    size += 1
-    stack.extend(graph[x])
-    ```
+
+```python
+
+size += 1
+
+stack.extend(graph[x])
+
+```
 
 #### From scratch
 
@@ -274,18 +278,18 @@ Write `largest_component(graph) -> set` returning the set of vertices in the lar
 
 ```python
 def is_bipartite_buggy(graph):
-   color = {}
-   for start in graph:
-       if start in color:
-           continue
-       color[start] = 0
-       for v in graph:                  # ← suspicious
-           for u in graph[v]:
-               if u not in color:
-                   color[u] = 1 - color[v]
-               elif color[u] == color[v]:
-                   return False
-   return True
+    color = {}
+    for start in graph:
+        if start in color:
+            continue
+        color[start] = 0
+        for v in graph:                  # ← suspicious
+            for u in graph[v]:
+                if u not in color:
+                    color[u] = 1 - color[v]
+                elif color[u] == color[v]:
+                    return False
+    return True
 ```
 
 What's wrong? Predict before revealing.
@@ -332,17 +336,24 @@ If you struggle, the undirected cycle detection section didn't fully land — re
 
 Honest yes/no:
 
-- Can I write the connected-components algorithm from scratch and explain why the total work is `O(V + E)`, not `O(V · E)`?
-- Can I explain in one sentence why white/gray/black fails on undirected graphs?
-- Can I explain why bipartite ⇔ no odd cycle?
-- Can I trace BFS-based bipartite checking on a small graph (5–6 vertices) by hand and predict the colors?
+Can I write the connected-components algorithm from scratch and explain why the total work is `O(V + E)`, not `O(V · E)`?
+
+Can I explain in one sentence why white/gray/black fails on undirected graphs?
+
+Can I explain why bipartite ⇔ no odd cycle?
+
+Can I trace BFS-based bipartite checking on a small graph (5–6 vertices) by hand and predict the colors?
 
 If any "no", do *one* practice exercise above. If all "yes", move on to [[Learning/DSA/Graphs/Topological-Sort]].
 
 ## 🔗 Related
 
-- Up: [[Learning/DSA/Graphs]]
-- Prev: [[Learning/DSA/Graphs/Traversals]]
-- Next: [[Learning/DSA/Graphs/Topological-Sort]]
-- Companion prereq: [[Learning/DSA/Disjoint-Set-Union]] (for DSU-based cycle detection and MST)
-- Practice problems: [[Learning/DSA/Graphs/Exercises]]
+Up: [[Learning/DSA/Graphs]]
+
+Prev: [[Learning/DSA/Graphs/Traversals]]
+
+Next: [[Learning/DSA/Graphs/Topological-Sort]]
+
+Companion prereq: [[Learning/DSA/Disjoint-Set-Union]] (for DSU-based cycle detection and MST)
+
+Practice problems: [[Learning/DSA/Graphs/Exercises]]

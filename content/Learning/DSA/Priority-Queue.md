@@ -1,9 +1,8 @@
 ---
 title: Priority-Queue
-tags: [learning, dsa, priority-queue, heap]
+tags: [learning, dsa, data-structures, priority-queue, heap]
 lastUpdated: 2026-05-15
 ---
-
 # Priority queue (binary heap)
 
 > Convention: Answer blocks are children of "Show answer" parents. Click the triangle to collapse — Logseq remembers.
@@ -14,7 +13,8 @@ Three problems, same shape:
 
 - **Task scheduler**: among all the tasks waiting to run, pick the *highest-priority* one next.
 - **Dijkstra's shortest path**: among all the frontier vertices, expand the *closest-to-source* one next.
-- **A* pathfinding**: pick the *most-promising* next state to explore.
+
+**A* pathfinding**: pick the *most-promising* next state to explore.
 
 Each problem repeatedly asks "what's the smallest/largest item in this collection?" while also adding new items. A sorted list answers the first question in `O(1)` but takes `O(n)` to add. A plain list takes `O(1)` to add but `O(n)` to find the min. A **priority queue** does both in `O(log n)`.
 
@@ -45,16 +45,16 @@ value:  [ 1, 1, 2, 3, 5, 9, 4, 6 ]
 
 Index arithmetic:
 
-- Parent of index `i`: `(i - 1) // 2`
-- Left child of `i`: `2*i + 1`
-- Right child of `i`: `2*i + 2`
+Parent of index `i`: `(i - 1) // 2`
+
+Left child of `i`: `2*i + 1`
+
+Right child of `i`: `2*i + 2`
 
 So the parent of index 7 (value 6) is `(7-1)//2 = 3` (value 3). The left child of index 1 (value 1) is `2*1 + 1 = 3` (value 3). Matches the tree above.
 
-**The heap invariant**: every parent is ≤ both its children (for a min-heap). The smallest element is always at index 0. The tree shape is a *complete binary tree* — every level full except possibly the last, which fills left-to-right.
-
-**Naming the parts**:
-
+- **The heap invariant**: every parent is ≤ both its children (for a min-heap). The smallest element is always at index 0. The tree shape is a *complete binary tree* — every level full except possibly the last, which fills left-to-right.
+- **Naming the parts**:
 - **Push** (or "insert"): add a new element.
 - **Pop** (or "extract-min"/"extract-max"): remove and return the smallest (or largest).
 - **Peek**: look at the smallest without removing.
@@ -214,13 +214,17 @@ def heap_top_k(arr, k):
 ```
 
 - Show the answer
-  - ```python
-    heapq.heappush(heap, -x)
-    ```
+
+```python
+
+heapq.heappush(heap, -x)
+
+```
   - ```python
     heapq.heapreplace(heap, -x)
     ```
-  - We use `-x` to simulate a max-heap with Python's min-heap. `heapreplace` is pop-then-push in one operation, slightly cheaper than the two separate calls.
+
+We use `-x` to simulate a max-heap with Python's min-heap. `heapreplace` is pop-then-push in one operation, slightly cheaper than the two separate calls.
 
 #### From scratch
 
@@ -293,15 +297,20 @@ If you can't, re-read the pop section.
 
 Honest yes/no:
 
-- Can I write `push` and `pop` (with sift-up / sift-down) from scratch?
-- Can I work out the parent and child index formulas without looking?
-- Can I explain why heapify is `O(n)` while one-at-a-time inserts are `O(n log n)`?
-- Do I know the lazy-deletion trick for handling Dijkstra-style "decrease-key" without an indexed heap?
+Can I write `push` and `pop` (with sift-up / sift-down) from scratch?
+
+Can I work out the parent and child index formulas without looking?
+
+Can I explain why heapify is `O(n)` while one-at-a-time inserts are `O(n log n)`?
+
+Do I know the lazy-deletion trick for handling Dijkstra-style "decrease-key" without an indexed heap?
 
 If any "no", do one practice exercise. If all "yes", move on to [[Learning/DSA/Graphs/Shortest-Paths]] (the first algorithm that really *needs* a priority queue).
 
 ## 🔗 Related
 
-- Up: [[Learning/DSA]]
-- Used by: [[Learning/DSA/Graphs/Shortest-Paths]] (Dijkstra), [[Learning/DSA/Graphs/MST]] (Prim)
-- Practice problems: [[Learning/DSA/Graphs/Exercises]]
+Up: [[Learning/DSA]]
+
+Used by: [[Learning/DSA/Graphs/Shortest-Paths]] (Dijkstra), [[Learning/DSA/Graphs/MST]] (Prim)
+
+Practice problems: [[Learning/DSA/Graphs/Exercises]]

@@ -1,9 +1,8 @@
 ---
 title: SCC
-tags: [learning, dsa, graphs, scc, bridges, articulation-points]
+tags: [learning, dsa, graphs, scc, kosaraju, tarjan]
 lastUpdated: 2026-05-15
 ---
-
 # Strongly connected components, bridges, articulation points
 
 > Convention: Answer blocks are children of "Show answer" parents. Click the triangle to collapse — Logseq remembers.
@@ -14,8 +13,9 @@ In an *undirected* graph, "connected component" is straightforward: two vertices
 
 In a *directed* graph, "connected" is trickier. Consider a Twitter follow graph:
 
-- Alice follows Bob; Bob follows Alice → mutual follow.
-- Bob follows Carol; Carol doesn't follow Bob → one-way.
+Alice follows Bob; Bob follows Alice → mutual follow.
+
+Bob follows Carol; Carol doesn't follow Bob → one-way.
 
 You can reach Carol *from* Bob, but not Bob *from* Carol. So in a directed-graph sense, Bob and Carol are "weakly" connected but not "strongly" connected. **Strongly connected** means: there's a directed path *both ways* between every pair of vertices in the component.
 
@@ -26,14 +26,46 @@ Real-world uses for finding **Strongly Connected Components** (SCCs):
 - **Type inference**: variables in mutual recursion in Hindley-Milner.
 - **2-SAT solving**: classical reduction to SCCs in the implication graph.
 - **Deadlock detection**: a cycle in the resource-allocation graph = a strongly-connected component with >1 vertex.
-
-And a closely-related undirected pair: **bridges** (edges whose removal disconnects the graph) and **articulation points** (vertices whose removal disconnects the graph). Both are about robustness — "what's the single point of failure?"
-
-This page covers Kosaraju's and Tarjan's algorithms for SCCs, then briefly touches on bridges/articulation points.
+  - And a closely-related undirected pair: **bridges** (edges whose removal disconnects the graph) and **articulation points** (vertices whose removal disconnects the graph). Both are about robustness — "what's the single point of failure?"
+  - This page covers Kosaraju's and Tarjan's algorithms for SCCs, then briefly touches on bridges/articulation points.
 
 ## A tiny worked example
 
-Take this directed graph:
+A small directed graph:
+
+```
+1 ──→ 2 ──→ 3
+↑     │     │
+│     ↓     ↓
+4 ←── 5     6
+    ↑     │
+    │     ↓
+    └─────┘
+```
+
+Edges:
+
+```
+1 → 2
+2 → 3
+2 → 5
+3 → 6
+4 → 1
+5 → 4
+6 → 5
+```
+
+The SCCs:
+
+`{1, 2, 5, 4}` — there's a cycle 1→2→5→4→1.
+
+`{3, 6}` — there's a cycle 3→6→5? No wait — 6→5 leaves the {3,6} cluster. Let me re-examine: from 3, can I reach 6? Yes (3→6). From 6, can I reach 3? Only via 6→5→4→1→2→3. So 6 *can* reach 3, but only by going through {1,2,5,4} first. So {3,6} *is* its own SCC — they reach each other only through other SCCs, which doesn't count.
+
+Actually wait — for two vertices to be in the same SCC, the directed paths between them must exist, but those paths *can* go through any vertices in the graph, including other SCCs.
+
+Let me recompute. Can 3 reach 6? 3→6, yes. Can 6 reach 3? 6→5→4→1→2→3, yes. So 3 and 6 are mutually reachable → same SCC. But also 5 (and 4, 1, 2) are reachable from 6 and 6 is reachable from each of them — so actually **everything is in one big SCC**!
+
+Let me verify with a cleaner example. Take this graph instead:
 
 ```
 1 ──→ 2 ──→ 3
@@ -55,16 +87,17 @@ Edges:
 6 → 5
 ```
 
-The SCCs are:
+Now the SCCs are:
 
-- `{1, 2, 4}` — cycle 1→2→4→1.
-- `{3}` — 3 has no outgoing edges; nothing reaches back.
-- `{5, 6}` — cycle 5→6→5.
+`{1, 2, 4}` — cycle 1→2→4→1.
+
+`{3}` — 3 has no outgoing edges; nothing reaches back.
+
+`{5, 6}` — cycle 5→6→5.
 
 Three SCCs, none of which connect bidirectionally to another. This is the example we'll trace below.
 
-**Naming the parts**:
-
+- **Naming the parts**:
 - **Strongly Connected Component (SCC)** — maximal set of vertices where every pair has directed paths both ways.
 - **Condensation** — the graph you get by collapsing each SCC into a single super-vertex. The condensation is always a **DAG** (proof by contradiction — a cycle of SCCs would mean they were all one big SCC).
 - **Transpose graph** `G^T` — same vertices, every edge reversed. SCCs in `G` are the same as SCCs in `G^T`. This is the basis of Kosaraju's algorithm.
@@ -114,14 +147,13 @@ Time: `O(V + E)` — two DFS passes.
 
 Two key facts:
 
-1. **The vertex with the latest finish time in pass 1 belongs to a "source" SCC of the condensation.** (Intuition: DFS-finish order topologically sorts the *condensation*, and the last-finishing vertex is in the condensation's source.)
-2. **In the transpose graph, DFS from a source-SCC vertex can only reach its own SCC** — because all outgoing edges from that SCC in the original graph are now incoming edges in the transpose.
-
-Combining: process vertices in reverse pass-1-finish order. The first unvisited vertex is in a source SCC of the condensation. DFS on the transpose from it reaches exactly its SCC. Mark those visited; move on; next unvisited vertex is in the next-most-source SCC; etc.
+- **The vertex with the latest finish time in pass 1 belongs to a "source" SCC of the condensation.** (Intuition: DFS-finish order topologically sorts the *condensation*, and the last-finishing vertex is in the condensation's source.)
+- **In the transpose graph, DFS from a source-SCC vertex can only reach its own SCC** — because all outgoing edges from that SCC in the original graph are now incoming edges in the transpose.
+  - Combining: process vertices in reverse pass-1-finish order. The first unvisited vertex is in a source SCC of the condensation. DFS on the transpose from it reaches exactly its SCC. Mark those visited; move on; next unvisited vertex is in the next-most-source SCC; etc.
 
 ### Tracing on our 6-vertex example
 
-**Pass 1** (DFS on original, starting from 1 — implementation might start anywhere, this is one valid run):
+- **Pass 1** (DFS on original, starting from 1 — implementation might start anywhere, this is one valid run):
 
 ```
 DFS(1): visit 1; recurse to 2
@@ -138,7 +170,7 @@ Finish 5.
 Post-order finish: [3, 4, 2, 1, 6, 5]
 ```
 
-**Pass 2** (DFS on transpose, in REVERSE post-order: 5, 6, 1, 2, 4, 3):
+- **Pass 2** (DFS on transpose, in REVERSE post-order: 5, 6, 1, 2, 4, 3):
 
 ```
 Transpose: 1: [4], 2: [1], 3: [2], 4: [2], 5: [6], 6: [5]
@@ -216,7 +248,7 @@ Time: `O(V + E)`. Space: `O(V)` (stack + bookkeeping).
 | Output order | source SCCs first (topological order of condensation) | sink SCCs first (reverse topological order of condensation) |
 | Practical speed | slower (touches edges twice) | faster (single pass) |
 
-**Default pick for interviews**: Kosaraju's. Easy to remember; correctness obvious. Tarjan's is faster but tricky to implement under pressure.
+- **Default pick for interviews**: Kosaraju's. Easy to remember; correctness obvious. Tarjan's is faster but tricky to implement under pressure.
 
 ## Bridges and articulation points (undirected)
 
@@ -224,8 +256,9 @@ A **bridge** is an edge whose removal disconnects the graph. An **articulation p
 
 Both can be found in `O(V + E)` with a single DFS pass using the **lowlink** trick from Tarjan's:
 
-- During DFS, for each tree edge `(u, v)`: it's a **bridge** iff `low[v] > disc[u]` (i.e., `v`'s subtree can't reach `u` or any ancestor of `u` without going through this edge).
-- A vertex `u` is an **articulation point** iff: (a) it's the root of the DFS tree and has ≥ 2 children, OR (b) it's not the root and has some child `v` with `low[v] ≥ disc[u]`.
+During DFS, for each tree edge `(u, v)`: it's a **bridge** iff `low[v] > disc[u]` (i.e., `v`'s subtree can't reach `u` or any ancestor of `u` without going through this edge).
+
+A vertex `u` is an **articulation point** iff: (a) it's the root of the DFS tree and has ≥ 2 children, OR (b) it's not the root and has some child `v` with `low[v] ≥ disc[u]`.
 
 ```python
 def bridges_and_aps(graph):
@@ -316,13 +349,16 @@ def condensation(graph):
 ```
 
 - Show the answer
-  - ```python
-    i = scc_id[v]
-    j = scc_id[u]
-    if i != j:
-        condensed[i].add(j)
-    ```
-  - Use a `set` (not list) to avoid duplicate edges in the condensation if multiple inter-SCC edges exist between the same pair.
+
+```python
+
+- i = scc_id[v]
+- j = scc_id[u]
+- if i != j:
+- condensed[i].add(j)
+
+```
+- Use a `set` (not list) to avoid duplicate edges in the condensation if multiple inter-SCC edges exist between the same pair.
 
 #### From scratch
 
@@ -332,20 +368,19 @@ Implement Tarjan's algorithm from a blank file. Test it on the 6-vertex example 
 
 ```python
 def kosaraju_buggy(graph):
- visited = set()
- order = []
+  visited = set()
+  order = []
 
- def dfs(v, g):
-     visited.add(v)
-     for u in g[v]:
-         if u not in visited:
-             dfs(u, g)
-     order.append(v)
+  def dfs(v, g):
+      visited.add(v)
+      for u in g[v]:
+          if u not in visited:
+              dfs(u, g)
+      order.append(v)
 
- for v in graph:
-     if v not in visited:
-         dfs(v, graph)
-```
+  for v in graph:
+      if v not in visited:
+          dfs(v, graph)
 
 Predict the bug before revealing.
 
@@ -394,17 +429,24 @@ If you can't, re-read the "why does it work" section.
 
 Honest yes/no:
 
-- Can I explain in plain language what an SCC is, and why the condensation must be a DAG?
-- Can I write Kosaraju's algorithm from scratch (with the transpose graph build)?
-- Can I trace Kosaraju's on a small graph and predict the SCCs correctly?
-- Do I understand at least the *intuition* behind Tarjan's lowlink, even if I'd prefer to write Kosaraju's in an interview?
-- Do I know how bridges and articulation points relate to the same DFS-lowlink machinery?
+Can I explain in plain language what an SCC is, and why the condensation must be a DAG?
+
+Can I write Kosaraju's algorithm from scratch (with the transpose graph build)?
+
+Can I trace Kosaraju's on a small graph and predict the SCCs correctly?
+
+Do I understand at least the *intuition* behind Tarjan's lowlink, even if I'd prefer to write Kosaraju's in an interview?
+
+Do I know how bridges and articulation points relate to the same DFS-lowlink machinery?
 
 If any "no", do one practice exercise. If all "yes", the entire Graphs curriculum is done — congratulations. Head back to [[Learning/DSA/Graphs]] for a sense of what you've covered, then to [[Learning/DSA/Graphs/Exercises]] to start putting it into practice.
 
 ## 🔗 Related
 
-- Up: [[Learning/DSA/Graphs]]
-- Prev: [[Learning/DSA/Graphs/Shortest-Paths]]
-- Companion: [[Learning/DSA/Graphs/Connectivity]] (undirected connectivity), [[Learning/DSA/Graphs/Traversals]] (DFS foundations)
-- Practice problems: [[Learning/DSA/Graphs/Exercises]]
+Up: [[Learning/DSA/Graphs]]
+
+Prev: [[Learning/DSA/Graphs/Shortest-Paths]]
+
+Companion: [[Learning/DSA/Graphs/Connectivity]] (undirected connectivity), [[Learning/DSA/Graphs/Traversals]] (DFS foundations)
+
+Practice problems: [[Learning/DSA/Graphs/Exercises]]

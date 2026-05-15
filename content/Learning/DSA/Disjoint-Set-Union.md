@@ -1,9 +1,8 @@
 ---
 title: Disjoint-Set-Union
-tags: [learning, dsa, dsu, union-find]
+tags: [learning, dsa, data-structures, dsu, union-find]
 lastUpdated: 2026-05-15
 ---
-
 # Disjoint-Set-Union (Union-Find)
 
 > Convention: Answer blocks are children of "Show answer" parents. Click the triangle to collapse — Logseq remembers.
@@ -15,8 +14,7 @@ Three problems, all "are these things in the same group?":
 - **Network connectivity**: as you add cables one at a time, can computer A and computer B talk yet?
 - **Image processing — flood fill**: when you bucket-fill a region, the algorithm is asking "is this pixel in the same connected region as the click?"
 - **Kruskal's MST**: when considering an edge `(u, v)`, are `u` and `v` already in the same component? If yes, adding this edge would create a cycle — skip it.
-
-The naive approach (store a "component id" per vertex, scan everyone on each union) is `O(n)` per operation. The **Disjoint-Set-Union** (DSU, also called Union-Find) data structure does both `find` and `union` in **almost constant time** (`O(α(n))`, where α is the inverse Ackermann function — at most 4 for any input your computer can fit in memory).
+  - The naive approach (store a "component id" per vertex, scan everyone on each union) is `O(n)` per operation. The **Disjoint-Set-Union** (DSU, also called Union-Find) data structure does both `find` and `union` in **almost constant time** (`O(α(n))`, where α is the inverse Ackermann function — at most 4 for any input your computer can fit in memory).
 
 DSU is the smallest, cheapest data structure in the curriculum, and it powers a *lot*: Kruskal's MST, undirected cycle detection, percolation simulations, Tarjan's offline LCA, even some compiler-internal type inference algorithms.
 
@@ -30,15 +28,17 @@ parent = [0, 1, 2, 3, 4]    # each element is its own parent (its own root)
 
 Now we apply some unions:
 
-1. `union(0, 1)`: make 1's root (which is 1) point to 0's root (which is 0). State: `{0, 1}, {2}, {3}, {4}`.
-2. `union(2, 3)`: State: `{0, 1}, {2, 3}, {4}`.
-3. `union(0, 2)`: State: `{0, 1, 2, 3}, {4}`.
-4. `find(3)` should now return the same root as `find(0)`.
+`union(0, 1)`: make 1's root (which is 1) point to 0's root (which is 0). State: `{0, 1}, {2}, {3}, {4}`.
+
+`union(2, 3)`: State: `{0, 1}, {2, 3}, {4}`.
+
+`union(0, 2)`: State: `{0, 1, 2, 3}, {4}`.
+
+`find(3)` should now return the same root as `find(0)`.
 
 The `parent` array might look like `[0, 0, 0, 2, 4]` after these operations — but the *root* of the tree containing any vertex in `{0, 1, 2, 3}` is `0`. Walking the parent pointers from `3 → 2 → 0` finds the root.
 
-**Naming the parts**:
-
+- **Naming the parts**:
 - **Element** — one of the things we're grouping (a vertex, a pixel, a computer).
 - **Set** (or *component*) — a group of elements that have been unioned together.
 - **Representative** (or *root*) — the unique element that identifies a set. Two elements are in the same set iff they have the same root.
@@ -155,11 +155,14 @@ class DSUBySize:
 ```
 
 - Show the answer
-  - ```python
-    rx, ry = ry, rx               # swap so rx is the larger set
-    self.parent[ry] = rx
-    self.size[rx] += self.size[ry]
-    ```
+
+```python
+
+- rx, ry = ry, rx               # swap so rx is the larger set
+- self.parent[ry] = rx
+- self.size[rx] += self.size[ry]
+
+```
   - After the swap, `rx` is always the larger-or-equal set, so attach `ry` under it and add `ry`'s size into `rx`'s size.
 
 #### From scratch
@@ -170,20 +173,19 @@ Implement DSU **without** recursion (iterative `find`). Hint: do two passes — 
 
 ```python
 class BrokenDSU:
-   def __init__(self, n):
-       self.parent = list(range(n))
+    def __init__(self, n):
+        self.parent = list(range(n))
 
-   def find(self, x):
-       while self.parent[x] != x:
-           x = self.parent[x]
-       return x                          # no path compression
+    def find(self, x):
+        while self.parent[x] != x:
+            x = self.parent[x]
+        return x                          # no path compression
 
-   def union(self, x, y):
-       self.parent[x] = self.parent[y]   # ← suspicious
+    def union(self, x, y):
+        self.parent[x] = self.parent[y]   # ← suspicious
 ```
 
-Two issues. Predict before revealing.
-
+- Two issues. Predict before revealing.
 - Show the bugs
   - **Bug 1**: `union` operates on raw `x` and `y` instead of their roots. After `union(0, 1)` and `union(0, 2)`, you've set `parent[0] = 1` then `parent[0] = 2` — but 1 and 2 are still in disjoint trees because nothing ever connected 1 and 2 directly. The fix: `self.parent[self.find(x)] = self.find(y)`.
   - **Bug 2**: No union-by-rank/size. Even after fixing Bug 1, pathological input sequences can build a linear chain. Performance degrades from `O(α(n))` to `O(log n)` or worse.
@@ -224,15 +226,20 @@ If you can't, re-read the optimizations section.
 
 Honest yes/no:
 
-- Can I write DSU from scratch (with path compression and union-by-rank) in under 20 lines?
-- Can I explain in plain language why the two optimizations matter?
-- Can I trace `union(0,1), union(2,3), union(0,2), find(3)` on paper and produce the correct root?
-- Do I know two non-graph problems DSU solves?
+Can I write DSU from scratch (with path compression and union-by-rank) in under 20 lines?
+
+Can I explain in plain language why the two optimizations matter?
+
+Can I trace `union(0,1), union(2,3), union(0,2), find(3)` on paper and produce the correct root?
+
+Do I know two non-graph problems DSU solves?
 
 If any "no", do one practice exercise. If all "yes", move on to [[Learning/DSA/Graphs/MST]] — DSU is the missing piece for Kruskal's.
 
 ## 🔗 Related
 
-- Up: [[Learning/DSA]]
-- Used by: [[Learning/DSA/Graphs/MST]] (Kruskal's), [[Learning/DSA/Graphs/Connectivity]] (undirected cycle detection)
-- Practice problems: [[Learning/DSA/Graphs/Exercises]]
+Up: [[Learning/DSA]]
+
+Used by: [[Learning/DSA/Graphs/MST]] (Kruskal's), [[Learning/DSA/Graphs/Connectivity]] (undirected cycle detection)
+
+Practice problems: [[Learning/DSA/Graphs/Exercises]]
