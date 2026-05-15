@@ -491,3 +491,53 @@ span.cloze {
   border-color: var(--secondary);
   color: var(--dark);
 }
+
+/* Filter polish: per-chip counts + Select all / Clear buttons. */
+
+.review-filter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.review-filter-actions {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+.review-filter-action {
+  border: 1px solid var(--lightgray);
+  background: transparent;
+  color: var(--darkgray);
+  font-size: 0.75em;
+  padding: 0.15rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.review-filter-action:hover:not(:disabled) {
+  border-color: var(--secondary);
+  color: var(--dark);
+}
+.review-filter-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.review-tag-count {
+  display: inline-block;
+  margin-left: 0.25em;
+  padding: 0 0.4em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--lightgray) 70%, transparent);
+  color: var(--gray);
+  font-size: 0.8em;
+  font-variant-numeric: tabular-nums;
+}
+.review-tag-chip.is-on .review-tag-count {
+  background: color-mix(in srgb, var(--secondary) 40%, transparent);
+  color: var(--dark);
+}
+.review-counts strong {
+  color: var(--dark);
+  font-variant-numeric: tabular-nums;
+}

@@ -46,6 +46,7 @@ type Filter = { tags: string[]; mode: Mode }
 
 let cachedCards: CardEntry[] | null = null
 let availableTags: string[] = [] // sorted, universal-tag-stripped
+let tagCardCount: Record<string, number> = {} // cards-on-pages-with-this-tag
 let queue: CardEntry[] = []
 let currentId: string | null = null
 let progress = { reviewed: 0, total: 0 }
@@ -103,19 +104,27 @@ function applyTagFilter(cards: CardEntry[], f: Filter): CardEntry[] {
 /**
  * Tags that appear on EVERY card are useless as filters (selecting them
  * narrows nothing). Hide them from the chip list to keep the UI tidy.
+ *
+ * Returns the sorted tag list AND a per-tag card count map. The map is the
+ * raw count (cards on pages with this tag), used in the chip label to show
+ * the prospective queue size without forcing the user to click first.
  */
-function computeAvailableTags(cards: CardEntry[]): string[] {
-  if (cards.length === 0) return []
+function computeAvailableTags(cards: CardEntry[]): {
+  tags: string[]
+  counts: Record<string, number>
+} {
+  if (cards.length === 0) return { tags: [], counts: {} }
   const tagCounts = new Map<string, number>()
   for (const c of cards) {
     for (const t of c.tags) {
       tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)
     }
   }
-  return [...tagCounts.entries()]
-    .filter(([, n]) => n < cards.length) // strip universal tags
-    .map(([t]) => t)
-    .sort()
+  const filterable = [...tagCounts.entries()].filter(([, n]) => n < cards.length)
+  return {
+    tags: filterable.map(([t]) => t).sort(),
+    counts: Object.fromEntries(filterable),
+  }
 }
 
 /* ---------- Queue ---------- */
@@ -178,7 +187,8 @@ function renderFilterArea(filter: Filter, filteredTotal: number, total: number) 
   const chips = availableTags
     .map((t) => {
       const on = filter.tags.includes(t)
-      return `<button type="button" class="review-tag-chip${on ? " is-on" : ""}" data-tag="${escapeHtml(t)}" aria-pressed="${on ? "true" : "false"}">${on ? "× " : ""}${escapeHtml(t)}</button>`
+      const n = tagCardCount[t] ?? 0
+      return `<button type="button" class="review-tag-chip${on ? " is-on" : ""}" data-tag="${escapeHtml(t)}" aria-pressed="${on ? "true" : "false"}">${on ? "× " : ""}${escapeHtml(t)} <span class="review-tag-count">${n}</span></button>`
     })
     .join("")
   const combinator = showCombinator
@@ -191,11 +201,20 @@ function renderFilterArea(filter: Filter, filteredTotal: number, total: number) 
   const left = queue.length
   const countsLine =
     filter.tags.length === 0
-      ? `Showing all ${total} cards · ${reviewed} reviewed · ${left} left`
-      : `Showing ${filteredTotal} of ${total} cards · ${reviewed} reviewed · ${left} left`
+      ? `<strong>${total}</strong> cards in queue · ${reviewed} reviewed · ${left} left`
+      : `<strong>${filteredTotal}</strong> of ${total} cards in queue · ${reviewed} reviewed · ${left} left`
+  // Select-all is meaningful only when at least one tag isn't already selected.
+  const allOn = availableTags.length > 0 && filter.tags.length === availableTags.length
+  const noneOn = filter.tags.length === 0
   filterAreaEl.innerHTML = `
     <div class="review-filter">
-      <div class="review-filter-label">Filter by tag</div>
+      <div class="review-filter-head">
+        <span class="review-filter-label">Filter by tag</span>
+        <span class="review-filter-actions">
+          <button type="button" class="review-filter-action" data-action="select-all" ${allOn ? "disabled" : ""}>Select all</button>
+          <button type="button" class="review-filter-action" data-action="clear" ${noneOn ? "disabled" : ""}>Clear</button>
+        </span>
+      </div>
       <div class="review-tag-chips">${chips || `<span class="review-tag-empty">No filterable tags</span>`}</div>
       ${combinator}
       <div class="review-counts">${countsLine}</div>
@@ -219,6 +238,17 @@ function renderFilterArea(filter: Filter, filteredTotal: number, total: number) 
     r.addEventListener("change", () => {
       const f = parseUrlFilter()
       f.mode = r.value === "and" ? "and" : "or"
+      writeUrlFilter(f)
+      onFilterChange()
+    })
+  })
+  // Wire Select all / Clear
+  filterAreaEl.querySelectorAll<HTMLButtonElement>(".review-filter-action").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const action = btn.dataset.action
+      const f = parseUrlFilter()
+      if (action === "select-all") f.tags = [...availableTags]
+      else if (action === "clear") f.tags = []
       writeUrlFilter(f)
       onFilterChange()
     })
@@ -347,7 +377,9 @@ async function setup() {
     return
   }
 
-  availableTags = computeAvailableTags(cards)
+  const { tags, counts } = computeAvailableTags(cards)
+  availableTags = tags
+  tagCardCount = counts
   const filter = parseUrlFilter()
   const filtered = applyTagFilter(cards, filter)
   queue = rebuildQueue(filtered)
