@@ -23,13 +23,12 @@ declare global {
   }
 }
 
-const INDEX_URL = "/todos-index.json"
-
 async function loadIndex(): Promise<Record<string, number>> {
   if (window.__learningTodosIndex) return window.__learningTodosIndex
   try {
-    const base = document.querySelector<HTMLBaseElement>("base")?.href ?? "/"
-    const url = new URL(INDEX_URL.replace(/^\//, ""), base).toString()
+    // Leading-slash path → origin-relative, so it resolves regardless of
+    // whether the current URL has a trailing slash.
+    const url = new URL("/todos-index.json", document.baseURI).toString()
     const res = await fetch(url, { credentials: "omit" })
     if (!res.ok) throw new Error(`fetch failed: ${res.status}`)
     const data = (await res.json()) as Record<string, number>
