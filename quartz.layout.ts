@@ -25,6 +25,7 @@ export const defaultContentPageLayout: PageLayout = {
     Component.ContentMeta(),
     Component.TagList(),
     Component.LlmDisclaimer(),
+    Component.PageDoneToggle(),
   ],
   left: [
     Component.PageTitle(),
