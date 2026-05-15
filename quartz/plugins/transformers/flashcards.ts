@@ -14,6 +14,8 @@ import checkboxesScript from "../../components/scripts/checkboxes.inline"
 import explorerProgressScript from "../../components/scripts/explorer-progress.inline"
 // @ts-ignore
 import annotationsScript from "../../components/scripts/annotations.inline"
+// @ts-ignore
+import reviewScript from "../../components/scripts/review.inline"
 import flashcardsStyle from "../../components/styles/flashcards.inline.scss"
 
 const CARD_TAG_RE = /(^|\s)#card\b/
@@ -227,6 +229,12 @@ export const Flashcards: QuartzTransformerPlugin = () => ({
       },
       {
         script: annotationsScript,
+        loadTime: "afterDOMReady",
+        contentType: "inline",
+      },
+      {
+        // Only does anything on the /review page (looks for #review-root).
+        script: reviewScript,
         loadTime: "afterDOMReady",
         contentType: "inline",
       },

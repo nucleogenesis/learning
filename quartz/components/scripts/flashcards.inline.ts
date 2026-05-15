@@ -27,6 +27,8 @@ declare global {
       read: () => { cards: Record<string, CardState> }
       update: (fn: (s: { cards: Record<string, CardState> }) => void) => void
     }
+    __setupFlashcards?: () => void
+    __setupCloze?: () => void
   }
 }
 
@@ -88,10 +90,16 @@ function formatDue(state: CardState, nowMs: number): string {
 
 function setupCards() {
   if (!window.LearningState) return
-  const cards = document.querySelectorAll<HTMLElement>("li.flashcard[data-card-id]")
+  // Idempotent: skip cards that already have handlers attached so callers
+  // (e.g., the /review page) can re-run setup after injecting new card DOM
+  // without duplicating click handlers on existing ones.
+  const cards = document.querySelectorAll<HTMLElement>(
+    'li.flashcard[data-card-id]:not([data-srs-attached="1"])',
+  )
   cards.forEach((card) => {
     const id = card.getAttribute("data-card-id")
     if (!id) return
+    card.setAttribute("data-srs-attached", "1")
 
     const dueEl = card.querySelector<HTMLElement>(".flashcard-due")
     const refresh = () => {
@@ -136,8 +144,9 @@ function onClozeKey(this: HTMLElement, ev: KeyboardEvent) {
 }
 
 function setupCloze() {
-  const clozes = document.querySelectorAll<HTMLElement>("span.cloze")
+  const clozes = document.querySelectorAll<HTMLElement>('span.cloze:not([data-cloze-attached="1"])')
   clozes.forEach((el) => {
+    el.setAttribute("data-cloze-attached", "1")
     el.addEventListener("click", toggleCloze)
     el.addEventListener("keydown", onClozeKey)
     window.addCleanup(() => {
@@ -146,6 +155,11 @@ function setupCloze() {
     })
   })
 }
+
+// Expose so other scripts (e.g., the /review page injecting cards) can
+// reattach handlers to dynamically-added DOM.
+window.__setupFlashcards = setupCards
+window.__setupCloze = setupCloze
 
 document.addEventListener("nav", () => {
   setupCloze()
