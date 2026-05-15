@@ -1,6 +1,5 @@
 ---
 title: Exercises
-aliases: ["Learning/DSA/Graphs/Exercises"]
 tags: [learning, dsa, graphs, exercises]
 lastUpdated: 2026-05-14
 ---
