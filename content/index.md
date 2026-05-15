@@ -1,5 +1,5 @@
 ---
-title: learning
+title: Learning Notes
 ---
 
 Public study notes. Source of truth is a private Logseq graph; only the `Learning/**` namespace is published here.

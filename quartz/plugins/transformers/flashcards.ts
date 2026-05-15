@@ -10,6 +10,8 @@ import stateScript from "../../components/scripts/state.inline"
 import flashcardsScript from "../../components/scripts/flashcards.inline"
 // @ts-ignore
 import checkboxesScript from "../../components/scripts/checkboxes.inline"
+// @ts-ignore
+import explorerProgressScript from "../../components/scripts/explorer-progress.inline"
 import flashcardsStyle from "../../components/styles/flashcards.inline.scss"
 
 const CARD_TAG_RE = /(^|\s)#card\b/
@@ -192,6 +194,11 @@ export const Flashcards: QuartzTransformerPlugin = () => ({
       },
       {
         script: checkboxesScript,
+        loadTime: "afterDOMReady",
+        contentType: "inline",
+      },
+      {
+        script: explorerProgressScript,
         loadTime: "afterDOMReady",
         contentType: "inline",
       },

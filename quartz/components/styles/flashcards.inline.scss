@@ -202,3 +202,45 @@ span.cloze {
     cursor: pointer;
   }
 }
+
+/* Explorer per-page progress decoration. */
+
+.explorer-ul a.page-done {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+.explorer-ul a.page-done::before {
+  content: "✓ ";
+  color: var(--tertiary, #2e7d32);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.explorer-todo-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin: 0.05rem 0 0.3rem 1.3em;
+  font-size: 0.7em;
+  color: var(--gray);
+}
+.explorer-todo-bar-track {
+  flex: 1 1 auto;
+  max-width: 7em;
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--lightgray) 60%, transparent);
+  overflow: hidden;
+  display: inline-block;
+}
+.explorer-todo-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.2s, background-color 0.2s;
+}
+.explorer-todo-bar-pct {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  min-width: 2.5em;
+}
