@@ -121,6 +121,56 @@ li.flashcard.is-due > .flashcard-details {
   border-color: color-mix(in srgb, #d9534f 50%, var(--lightgray));
 }
 
+/* Show-answer — collapsible reveal for "Show ..." labelled list items. */
+
+li.show-answer {
+  list-style: none;
+  margin-left: -1.2em;
+  margin-block: 0.4rem;
+}
+
+.show-answer-details {
+  border-left: 3px solid var(--lightgray);
+  padding: 0.3rem 0.75rem;
+  background: transparent;
+  transition: border-color 0.15s;
+
+  &[open] {
+    border-left-color: var(--secondary);
+  }
+
+  > .show-answer-label {
+    cursor: pointer;
+    color: var(--secondary);
+    list-style: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    &::-webkit-details-marker { display: none; }
+    &::marker { content: ""; }
+
+    &::before {
+      content: "▸";
+      transition: transform 0.15s;
+      display: inline-block;
+      flex-shrink: 0;
+      width: 1ch;
+    }
+
+    > * { margin: 0; }
+  }
+
+  &[open] > .show-answer-label::before { transform: rotate(90deg); }
+
+  > .show-answer-body {
+    margin-top: 0.4rem;
+
+    > :first-child { margin-top: 0; }
+    > :last-child { margin-bottom: 0; }
+  }
+}
+
 /* Cloze deletions — text blanked by CSS until clicked. */
 
 span.cloze {
