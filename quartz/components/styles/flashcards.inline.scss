@@ -1,0 +1,98 @@
+/* Flashcards — list items tagged #card render as click-to-reveal Q/A. */
+
+li.flashcard {
+  list-style: none;
+  margin-left: -1.2em;
+  margin-block: 0.4rem;
+}
+
+.flashcard-details {
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  background: var(--light);
+  transition: border-color 0.15s;
+
+  &[open] {
+    border-color: var(--secondary);
+  }
+
+  > .flashcard-q {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    /* Replace the default disclosure triangle with a custom marker. */
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &::marker {
+      content: "";
+    }
+
+    &::before {
+      content: "▸";
+      color: var(--secondary);
+      transition: transform 0.15s;
+      display: inline-block;
+      flex-shrink: 0;
+      width: 1ch;
+    }
+
+    > * {
+      margin: 0;
+    }
+  }
+
+  &[open] > .flashcard-q::before {
+    transform: rotate(90deg);
+  }
+
+  > .flashcard-a {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--lightgray);
+
+    > :first-child {
+      margin-top: 0;
+    }
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+/* Cloze deletions — text blanked by CSS until clicked. */
+
+span.cloze {
+  position: relative;
+  background: var(--highlight);
+  color: transparent;
+  border-bottom: 2px dotted var(--secondary);
+  border-radius: 2px;
+  padding: 0 0.15em;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s, color 0.15s;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--secondary) 18%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+  }
+
+  &.revealed {
+    color: inherit;
+    background: transparent;
+    border-bottom-style: solid;
+    border-bottom-color: var(--secondary);
+    user-select: text;
+    cursor: pointer;
+  }
+}
