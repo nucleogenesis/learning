@@ -1,6 +1,5 @@
 ---
 title: Graphs
-aliases: ["Learning/DSA/Graphs"]
 tags: [learning, dsa, graphs]
 lastUpdated: 2026-05-14
 ---

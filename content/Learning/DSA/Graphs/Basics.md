@@ -1,6 +1,5 @@
 ---
 title: Basics
-aliases: ["Learning/DSA/Graphs/Basics"]
 tags: [learning, dsa, graphs, basics]
 lastUpdated: 2026-05-14
 ---

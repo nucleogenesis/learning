@@ -1,6 +1,5 @@
 ---
 title: Traversals
-aliases: ["Learning/DSA/Graphs/Traversals"]
 tags: [learning, dsa, graphs, traversals, bfs, dfs]
 lastUpdated: 2026-05-14
 ---

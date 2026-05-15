@@ -1,6 +1,5 @@
 ---
 title: DSA
-aliases: ["Learning/DSA"]
 tags: [learning, dsa, index]
 lastUpdated: 2026-05-14
 ---
