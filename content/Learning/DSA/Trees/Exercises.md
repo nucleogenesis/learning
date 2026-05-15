@@ -1,6 +1,6 @@
 ---
 title: Exercises
-tags: [learning, dsa, trees, exercises]
+tags: [topic/dsa, topic/trees, kind/exercises]
 lastUpdated: 2026-05-15
 ---
 # Trees — exercises & problem sets

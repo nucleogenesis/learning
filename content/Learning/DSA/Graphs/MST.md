@@ -1,6 +1,6 @@
 ---
 title: MST
-tags: [learning, dsa, graphs, mst, kruskal, prim]
+tags: [topic/dsa, topic/graphs, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Minimum spanning tree — Kruskal and Prim
@@ -247,28 +247,28 @@ If you can't, re-read the algorithm sections.
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What is a **minimum spanning tree**? #card
+- What is a **minimum spanning tree**? #card #graphs/mst #mst
   - A subset of `V - 1` edges that connects every vertex, with minimum total weight. Connected + acyclic + spanning.
-- Two classic MST algorithms? #card
+- Two classic MST algorithms? #card #graphs/mst #mst
   - **Kruskal** (sort edges + DSU) and **Prim** (priority queue, grow tree from one vertex).
-- Time complexity of Kruskal? #card
+- Time complexity of Kruskal? #card #graphs/mst #kruskal #mst #complexity
   - `O(E log E)` ≈ `O(E log V)` — dominated by sorting edges.
-- Time complexity of Prim with binary heap? #card
+- Time complexity of Prim with binary heap? #card #graphs/mst #prim #mst #heap #complexity
   - `O(E log V)`.
-- Kruskal's core data structure? #card
+- Kruskal's core data structure? #card #graphs/mst #kruskal #mst
   - **Disjoint-Set-Union** (DSU / Union-Find), to detect cycles when considering each edge.
-- Prim's core data structure? #card
+- Prim's core data structure? #card #graphs/mst #prim #mst
   - **Priority queue** (min-heap), to find the cheapest edge leaving the current tree.
-- What's the **cut property**? #card
+- What's the **cut property**? #card #graphs/mst #mst
   - For any partition of vertices into two sets, the cheapest edge crossing the cut belongs to *some* MST. Justifies the greedy choices both algorithms make.
-- If edge weights are all distinct, is the MST unique? #card
+- If edge weights are all distinct, is the MST unique? #card #graphs/mst #mst
   - Yes. With ties, multiple MSTs may exist.
-- Do MST algorithms work with negative edge weights? #card
+- Do MST algorithms work with negative edge weights? #card #graphs/mst #mst
   - Yes — they just greedily pick smaller edges. (Unlike Dijkstra, which breaks on negative weights.)
-- Why does Prim push duplicate entries to the heap? #card
+- Why does Prim push duplicate entries to the heap? #card #graphs/mst #prim #mst #heap
   - Binary heap has no efficient decrease-key. Lazy deletion: push the new (cheaper) edge; skip stale entries when they pop. Same trick Dijkstra uses.
-- {{cloze A spanning tree on `n` vertices has exactly **`n − 1`** edges.}} #card
-- {{cloze Prim's algorithm is structurally identical to **Dijkstra** — same priority-queue-driven frontier expansion, different relaxation rule.}} #card
+- {{cloze A spanning tree on `n` vertices has exactly **`n − 1`** edges.}} #card #graphs/mst #mst
+- {{cloze Prim's algorithm is structurally identical to **Dijkstra** — same priority-queue-driven frontier expansion, different relaxation rule.}} #card #graphs/mst #dijkstra #prim #mst
 
 ---
 

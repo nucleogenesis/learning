@@ -1,6 +1,6 @@
 ---
 title: Exercises
-tags: [learning, typescript, exercises]
+tags: [topic/typescript, topic/type-system, kind/exercises]
 lastUpdated: 2026-05-15
 ---
 # TypeScript — exercises & practice sets

@@ -1,6 +1,6 @@
 ---
 title: Unions-And-Narrowing
-tags: [learning, typescript, unions, narrowing]
+tags: [topic/typescript, topic/type-system, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Unions and narrowing — the workhorse pattern
@@ -505,14 +505,14 @@ If you can't, the "encoded invariants" framing didn't land. Re-read the opening 
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What's a **discriminated union**? #card
+- What's a **discriminated union**? #card #ts/unions #discriminated-unions
   - A union of object types that share a common literal-typed field (the discriminant). Narrowing on that field gives access to variant-specific fields. The workhorse pattern for state modeling in TS.
-- What makes a field a valid **discriminant**? #card
+- What makes a field a valid **discriminant**? #card #ts/unions
   - It must be a **literal type** (e.g., `'idle'`, `'loading'`) and **unique per variant**. Without literal types, narrowing on equality doesn't work. Without uniqueness, narrowing is ambiguous.
-- {{cloze The most common discriminant field names are **`kind`**, **`type`**, **`status`**, or **`_tag`**.}} #card
-- TS narrows on `typeof x === 'string'` — what does it not narrow on? #card
+- {{cloze The most common discriminant field names are **`kind`**, **`type`**, **`status`**, or **`_tag`**.}} #card #ts/unions
+- TS narrows on `typeof x === 'string'` — what does it not narrow on? #card #ts/unions
   - It doesn't narrow on non-primitive checks like `Array.isArray` *without* the type guard signature. (Actually `Array.isArray` is a type guard in modern TS lib.d.ts.) The general principle: TS narrows on built-in operators (`typeof`, `instanceof`, `in`, equality) and on functions whose return type is a `x is T` predicate. Custom boolean returns *don't* narrow.
-- Signature for a user-defined **type guard**? #card
+- Signature for a user-defined **type guard**? #card #ts/unions #type-guards
 
 ```ts
 
@@ -521,25 +521,25 @@ function isCat(animal: Animal): animal is Cat
 ```
   - The `animal is Cat` return type is a type predicate. When the function returns true, the compiler narrows the argument to `Cat`.
 
-- Signature for an **assertion function**? #card
+- Signature for an **assertion function**? #card #ts/unions
   - ```ts
     function assertIsUser(value: unknown): asserts value is User
     ```
 
 If the function returns at all (i.e., doesn't throw), the value is narrowed to `User` for the rest of the calling scope.
 
-- Type guard vs assertion function — when to use which? #card
+- Type guard vs assertion function — when to use which? #card #ts/unions #type-guards
   - **Type guard** when you want to *branch* on the result (`if (isCat(x))`). **Assertion function** when failure should *throw* and the success case is the only path forward (`assertIsUser(input); use(input);`).
-- One real-world place to use a custom type guard? #card
+- One real-world place to use a custom type guard? #card #ts/unions #type-guards
   - Validating parsed JSON / network response shapes. The body of the guard does the runtime check; the type predicate gives you a typed value for the rest of the code. This is what Zod/io-ts automate.
-- What is the `never` type? #card
+- What is the `never` type? #card #ts/unions
   - The type with no values. Appears as the type of unreachable code paths, exhausted discriminated unions, and the return type of functions that always throw.
-- What does `assertNever(x: never): never` do? #card
+- What does `assertNever(x: never): never` do? #card #ts/unions #never
   - Enforces exhaustiveness checks. Inside a fully-narrowed `default:` branch, the variable should be `never`. If a new union variant is added without handling, the call fails to type-check — pointing you at every site that needs updating.
-- {{cloze Truthiness narrowing (`if (s)`) filters out `null`, `undefined`, `0`, `''`, and `NaN`. Use **`!= null`** or explicit checks when you want only the nullish ones.}} #card
-- Two reasons to prefer `Result<T, E>` over `try/catch`? #card
+- {{cloze Truthiness narrowing (`if (s)`) filters out `null`, `undefined`, `0`, `''`, and `NaN`. Use **`!= null`** or explicit checks when you want only the nullish ones.}} #card #ts/unions
+- Two reasons to prefer `Result<T, E>` over `try/catch`? #card #ts/unions
   - (1) Forgetting to handle the error is a *compile* error, not a runtime crash. (2) The error type is specific (not `unknown`). Trade-off: more verbose for the happy path.
-- The discriminated-union pattern is also called... #card
+- The discriminated-union pattern is also called... #card #ts/unions
   - **Tagged union**, **sum type**, or **algebraic data type**. All the same shape; the names come from different language traditions (Rust calls them enums, Haskell calls them sum types, TS just calls them unions).
 
 ---

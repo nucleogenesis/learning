@@ -1,6 +1,6 @@
 ---
 title: Branded-Types
-tags: [learning, typescript, branded-types, nominal]
+tags: [topic/typescript, topic/type-system, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Branded types — nominal typing on demand
@@ -430,10 +430,10 @@ If you can't, the "structural compatibility is the wrong default sometimes" fram
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What problem do **branded types** solve? #card
+- What problem do **branded types** solve? #card #ts/branded-types
   - They prevent accidental interchange of two types that are structurally identical but semantically distinct (e.g., `UserId` vs `Email`, both strings). Adds a phantom property to break structural compatibility without runtime cost.
-- {{cloze TypeScript's default is **structural** typing; branded types add **nominal** typing on demand.}} #card
-- Canonical brand syntax? #card
+- {{cloze TypeScript's default is **structural** typing; branded types add **nominal** typing on demand.}} #card #ts/branded-types
+- Canonical brand syntax? #card #ts/branded-types
 
 ```ts
 
@@ -444,27 +444,27 @@ If you can't, the "structural compatibility is the wrong default sometimes" fram
 
 ```
 
-- What's a **smart constructor**? #card
+- What's a **smart constructor**? #card #ts/branded-types
   - A function that takes the unbranded type, performs validation, and returns the branded type. Concentrates `as` casts into one place that can be audited. The trust boundary between unvalidated input and the rest of the codebase.
 
-- {{cloze Branded types have **zero runtime cost** — the phantom brand property never exists at runtime.}} #card
+- {{cloze Branded types have **zero runtime cost** — the phantom brand property never exists at runtime.}} #card #ts/branded-types
 
-- Three real-world places to reach for branded types? #card
+- Three real-world places to reach for branded types? #card #ts/branded-types
   - **IDs** across entity types (UserId vs OrderId), **validated inputs** (Email after regex check), **units of measure** (Meters vs Feet, Cents vs Dollars).
 
-- Why does `id.toUpperCase()` return `string` rather than `UserId` on a branded `UserId`? #card
+- Why does `id.toUpperCase()` return `string` rather than `UserId` on a branded `UserId`? #card #ts/branded-types
   - String methods are typed to return `string` regardless of branding. The intersection makes `UserId` callable like a string, but the brand isn't preserved through methods. Re-cast or wrap in a helper if you need to retain the brand.
 
-- Difference between literal-brand and unique-symbol-brand? #card
+- Difference between literal-brand and unique-symbol-brand? #card #ts/branded-types
   - Literal: `{ __brand: 'UserId' }` — readable, slight theoretical spoof risk. Unique-symbol: `{ [brand]: 'UserId' }` — bulletproof against accidental construction, slightly more verbose. Most codebases use literal; unique-symbol for security-critical types.
 
-- One sign you're **over-branding**? #card
+- One sign you're **over-branding**? #card #ts/branded-types
   - Every function call site needs an `as Brand` cast. The brand should flow through naturally — if it doesn't, the smart constructor is in the wrong place (probably too far downstream).
 
-- Branded types vs wrapper classes — which has runtime cost? #card
+- Branded types vs wrapper classes — which has runtime cost? #card #ts/branded-types
   - Wrapper classes (`class UserId { value: string }`) allocate an object per ID. Branded types are phantom — zero runtime cost. The trade-off: wrapper classes can attach methods (`UserId.parse`), brands cannot.
 
-- Phrase that describes the parse-once-then-trust pattern? #card
+- Phrase that describes the parse-once-then-trust pattern? #card #ts/branded-types
   - **"Parse, don't validate"** — coined in the Haskell world but applies directly to TS. Validate at the boundary, get a branded type back, trust the type system from there on. Don't re-validate inside the codebase.
 
 ---

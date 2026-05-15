@@ -1,6 +1,6 @@
 ---
 title: Binary-Search-Trees
-tags: [learning, dsa, trees, bst]
+tags: [topic/dsa, topic/trees, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Binary search trees
@@ -439,31 +439,31 @@ If you can't articulate the height argument, re-read the "Why balance matters" s
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- State the **BST property** (one sentence)? #card
+- State the **BST property** (one sentence)? #card #trees/bst
   - For every node, all keys in its left subtree are less than the node, and all keys in its right subtree are greater.
-- What does in-order traversal of a BST produce? #card
+- What does in-order traversal of a BST produce? #card #trees/bst
   - The keys in **ascending sorted order**.
-- Time complexity of BST search? #card
+- Time complexity of BST search? #card #trees/bst #complexity
   - `O(h)` where `h` is the tree height. `O(log n)` if balanced, `O(n)` worst case.
-- Time complexity of BST insert / delete? #card
+- Time complexity of BST insert / delete? #card #trees/bst #complexity
   - Both `O(h)`. The expensive part is finding the node; the structural surgery is `O(1)` extra.
-- Three cases for BST delete? #card
+- Three cases for BST delete? #card #trees/bst
   - 0 children (leaf — just remove). 1 child (splice the child up). 2 children (replace value with in-order successor or predecessor; then recursively delete that).
-- {{cloze The **in-order successor** of a node with a right child is the **leftmost** node in the right subtree.}} #card
-- Why does inserting keys in already-sorted order give a degenerate BST? #card
+- {{cloze The **in-order successor** of a node with a right child is the **leftmost** node in the right subtree.}} #card #trees/bst
+- Why does inserting keys in already-sorted order give a degenerate BST? #card #trees/bst
   - Each new key is larger than every existing key, so it always becomes the right child of the rightmost node. Tree becomes a right spine of depth `n − 1` — effectively a linked list.
-- What does AVL balance enforce? #card
+- What does AVL balance enforce? #card #trees/bst #avl
   - At every node, `|height(left) − height(right)| ≤ 1`. Height is bounded at `~1.44 log₂ n`.
-- What does Red-Black balance enforce? #card
+- What does Red-Black balance enforce? #card #trees/bst #red-black
   - Color-based: every root-to-leaf path has the same number of black nodes; no two reds in a row. Height bounded at `~2 log₂ n`.
-- AVL vs Red-Black — when to pick which? #card
+- AVL vs Red-Black — when to pick which? #card #trees/bst #avl #red-black
   - AVL: tighter height bound → faster lookups. Red-Black: fewer rotations on modification → faster inserts/deletes. Read-heavy → AVL. Mixed → Red-Black. The standard library usually uses Red-Black.
-- What are **B-trees** used for, in one sentence? #card
+- What are **B-trees** used for, in one sentence? #card #trees/bst
   - Wider-than-binary BSTs designed so each node fits a disk block — used for database indexes and filesystems where node access is the dominant cost.
-- {{cloze The two-children-delete case copies the **in-order successor**'s value into the doomed node, then deletes the **successor** from the right subtree.}} #card
-- Validate-a-BST: name two `O(n)` approaches. #card
+- {{cloze The two-children-delete case copies the **in-order successor**'s value into the doomed node, then deletes the **successor** from the right subtree.}} #card #trees/bst
+- Validate-a-BST: name two `O(n)` approaches. #card #trees/bst #complexity
   - (1) In-order traversal, check the output is strictly ascending. (2) Recurse with `(lo, hi)` bounds tightened as you descend.
-- LCA in a **BST** — why is it easier than LCA in a general binary tree? #card
+- LCA in a **BST** — why is it easier than LCA in a general binary tree? #card #trees/bst #binary-tree
   - The BST property tells you at each node whether both targets are in the same subtree (recurse there) or split across (current node is the LCA). No need to walk the whole tree.
 
 ---

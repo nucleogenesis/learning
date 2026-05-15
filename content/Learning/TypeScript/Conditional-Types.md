@@ -1,6 +1,6 @@
 ---
 title: Conditional-Types
-tags: [learning, typescript, conditional-types]
+tags: [topic/typescript, topic/type-system, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Conditional types — `T extends U ? X : Y`
@@ -400,18 +400,18 @@ Without notes, in ~5 sentences:
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What's a **conditional type**? #card
+- What's a **conditional type**? #card #ts/conditional-types
   - `T extends U ? X : Y` — a type-level ternary. Evaluates to `X` if `T` is assignable to `U`, otherwise `Y`. The `extends` here means "is assignable to," not OOP inheritance.
-- {{cloze A conditional type **distributes** over a union when the checked type is a **naked** type parameter.}} #card
-- How does `Exclude<'a' | 'b' | 'c', 'b'>` give `'a' | 'c'`? #card
+- {{cloze A conditional type **distributes** over a union when the checked type is a **naked** type parameter.}} #card #ts/conditional-types
+- How does `Exclude<'a' | 'b' | 'c', 'b'>` give `'a' | 'c'`? #card #ts/conditional-types
   - Distribution. Defined as `T extends U ? never : T`. The union splits, each member is tested individually, the matching ones become `never`, the rest survive. `never` is the identity of unions, so it drops out of the result.
-- How do you **opt out of distribution**? #card
+- How do you **opt out of distribution**? #card #ts/conditional-types
   - Wrap in single-element tuples: `[T] extends [U] ? X : Y`. The tuple wrapping makes `T` non-naked, so the conditional tests the whole type at once instead of distributing.
-- Why does `T extends never ? true : false` give `never` when `T = never`? #card
+- Why does `T extends never ? true : false` give `never` when `T = never`? #card #ts/conditional-types
   - `never` is the empty union (the union of zero types). Distribution over zero members produces zero terms, which is `never`. The fix: wrap in tuples — `[T] extends [never] ? true : false`.
-- What does `infer` do? #card
+- What does `infer` do? #card #ts/conditional-types #infer
   - Introduces a new type variable inside an `extends` clause and lets TS figure out what it is. Used to extract sub-types: `T extends Promise<infer U> ? U : never` plucks the wrapped type out of a Promise.
-- Write `ReturnType<F>` from scratch. #card
+- Write `ReturnType<F>` from scratch. #card #ts/conditional-types
 
 ```ts
 
@@ -420,19 +420,19 @@ type ReturnType<F> = F extends (...args: any[]) => infer R ? R : never;
 ```
   - `infer R` extracts the return type position from any callable. Falls back to `never` if `F` isn't a function.
 
-- Write `ElementOf<T>` for arrays. #card
+- Write `ElementOf<T>` for arrays. #card #ts/conditional-types
   - ```ts
     type ElementOf<T> = T extends (infer E)[] ? E : never;
     ```
 
 Works on arrays and tuples (tuples are arrays in the type system).
 
-- What does `Awaited<T>` do? #card
+- What does `Awaited<T>` do? #card #ts/conditional-types
   - Recursively unwraps Promises, including thenables and nested Promises. `Awaited<Promise<Promise<string>>>` = `string`. Used everywhere there's a generic-over-async-or-sync need.
-- One workflow pattern: derive a TypeScript type from a function's implementation? #card
+- One workflow pattern: derive a TypeScript type from a function's implementation? #card #ts/conditional-types
   - `type Result = ReturnType<typeof myFunction>`. The type updates automatically when the function's return shape changes. Eliminates duplication between value-level and type-level.
-- {{cloze When in doubt, reach for **discriminated unions** for domain modeling and **conditional types** for type-level transformations of existing types.}} #card
-- One sign you've overused conditional types in your codebase? #card
+- {{cloze When in doubt, reach for **discriminated unions** for domain modeling and **conditional types** for type-level transformations of existing types.}} #card #ts/conditional-types #discriminated-unions
+- One sign you've overused conditional types in your codebase? #card #ts/conditional-types
   - Error messages 100+ lines long, build times that grow nonlinearly with type-utility complexity, new contributors avoiding the types directory. Conditional types belong in libraries and API boundaries, not in application-domain modeling.
 
 ---

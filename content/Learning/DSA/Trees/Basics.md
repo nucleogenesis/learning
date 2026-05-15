@@ -1,6 +1,6 @@
 ---
 title: Basics
-tags: [learning, dsa, trees, basics]
+tags: [topic/dsa, topic/trees, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Trees — basics & representations
@@ -284,24 +284,24 @@ If you can't, the file-system / DOM motivations didn't land. Re-read "Why this m
 
 Don't drill these on your first read — that's cramming on the same day you encoded the material, which the spacing effect specifically warns against. They show up in tomorrow's queue.
 
-- What's the difference between **depth** and **height** of a node? #card
+- What's the difference between **depth** and **height** of a node? #card #trees/basics
   - Depth = edges from the root down to the node. Height = edges from the node down to its deepest descendant leaf. They're measured in opposite directions.
-- How many edges does a tree on `n` nodes have? #card
+- How many edges does a tree on `n` nodes have? #card #trees/basics
   - Exactly `n − 1`. (Connected requires ≥, acyclic forbids >.)
-- What's the difference between a **tree** and a **forest**? #card
+- What's the difference between a **tree** and a **forest**? #card #trees/basics
   - A tree is one connected acyclic graph with a designated root. A forest is a disjoint union of trees (possibly zero).
-- {{cloze A **leaf** is a node with no children; an **internal node** is one with at least one.}} #card
-- {{cloze A **binary** tree allows at most **2** children per node; an **n-ary** tree allows any number.}} #card
-- Why is a tree a special case of a graph? #card
+- {{cloze A **leaf** is a node with no children; an **internal node** is one with at least one.}} #card #trees/basics
+- {{cloze A **binary** tree allows at most **2** children per node; an **n-ary** tree allows any number.}} #card #trees/basics
+- Why is a tree a special case of a graph? #card #trees/basics
   - It's connected, acyclic, undirected — the three constraints that pin down "tree." Plus, we usually designate one node as the root.
-- What's the **subtree rooted at v**? #card
+- What's the **subtree rooted at v**? #card #trees/basics
   - The node `v` together with all of `v`'s descendants. It's itself a tree.
-- {{cloze The **root** of a tree has no **parent**; a **leaf** has no **children**.}} #card
-- Parent-pointer representation: how do you find a node's children? #card
+- {{cloze The **root** of a tree has no **parent**; a **leaf** has no **children**.}} #card #trees/basics
+- Parent-pointer representation: how do you find a node's children? #card #trees/basics
   - You can't, in `O(1)`. You'd scan the whole array. Parent-pointer is for upward walks; for downward walks use child-list.
-- When can you use the implicit array representation (parent at `(i-1)//2`, children at `2i+1`, `2i+2`) for a binary tree? #card
+- When can you use the implicit array representation (parent at `(i-1)//2`, children at `2i+1`, `2i+2`) for a binary tree? #card #trees/basics #binary-tree
   - Only when the tree is **complete** (every level full except possibly the last, which fills left-to-right). The heap is the canonical example.
-- The same undirected tree on `n` nodes can be re-rooted at any node. How many distinct rootings are there? #card
+- The same undirected tree on `n` nodes can be re-rooted at any node. How many distinct rootings are there? #card #trees/basics
   - `n` — one for each choice of root vertex. The underlying graph stays the same; parent/child directions flip along the path between the old and new root.
 
 ---

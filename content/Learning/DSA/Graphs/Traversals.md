@@ -1,6 +1,6 @@
 ---
 title: Traversals
-tags: [learning, dsa, graphs, traversals, bfs, dfs]
+tags: [topic/dsa, topic/graphs, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Graph traversals — BFS & DFS
@@ -355,30 +355,30 @@ If you can't construct the counterexample, the BFS invariant ("first arrival is 
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- BFS time complexity? #card
+- BFS time complexity? #card #graphs/traversals #bfs #complexity
   - `O(V + E)`.
-- DFS time complexity? #card
+- DFS time complexity? #card #graphs/traversals #dfs #complexity
   - `O(V + E)`.
-- BFS data structure? #card
+- BFS data structure? #card #graphs/traversals #bfs
   - FIFO queue.
-- DFS data structure? #card
+- DFS data structure? #card #graphs/traversals #dfs
   - LIFO stack (explicit, or implicit via recursion).
-- When does BFS find the shortest path? #card
+- When does BFS find the shortest path? #card #graphs/traversals #bfs #shortest-path
   - Unweighted (or uniformly-weighted) graphs. First arrival = shortest distance.
-- Why mark visited at **enqueue** time in BFS, not dequeue time? #card
+- Why mark visited at **enqueue** time in BFS, not dequeue time? #card #graphs/traversals #bfs
   - To prevent the same vertex being enqueued multiple times by different neighbors. Without this, queue size grows to `O(E)` instead of `O(V)`.
-- {{cloze BFS uses a **FIFO queue**; DFS uses a **LIFO stack**.}} #card
-- What is a **back edge** in DFS? #card
+- {{cloze BFS uses a **FIFO queue**; DFS uses a **LIFO stack**.}} #card #graphs/traversals #bfs #dfs
+- What is a **back edge** in DFS? #card #graphs/traversals #dfs
   - An edge to a vertex currently on the recursion stack (GRAY). In a directed graph, a back edge means a cycle.
-- In directed cycle detection, what do WHITE/GRAY/BLACK mean? #card
+- In directed cycle detection, what do WHITE/GRAY/BLACK mean? #card #graphs/traversals #dfs #cycle-detection
   - WHITE = unvisited. GRAY = currently being explored (on recursion stack). BLACK = fully explored. Seeing a GRAY neighbor = back edge = cycle.
-- Why doesn't WHITE/GRAY/BLACK work directly for undirected cycle detection? #card
+- Why doesn't WHITE/GRAY/BLACK work directly for undirected cycle detection? #card #graphs/traversals #dfs #cycle-detection
   - Every undirected edge appears in both directions, so the parent always looks like a GRAY neighbor. Fix: skip the parent vertex explicitly, or use Union-Find instead.
-- What's **multi-source BFS** good for? #card
+- What's **multi-source BFS** good for? #card #graphs/traversals #bfs
   - "Distance to the nearest X." Seed the queue with all Xs at distance 0; BFS spreads outward simultaneously from all of them.
-- How does DFS-based topological sort produce the order? #card
+- How does DFS-based topological sort produce the order? #card #graphs/traversals #dfs #topo-sort
   - Run DFS over all vertices, push each onto a stack when it *finishes* (post-order). Pop the stack at the end — that's the topological order.
-- {{cloze Recursive DFS and iterative DFS visit the same vertices, but in **different** orders because a stack reverses neighbor processing.}} #card
+- {{cloze Recursive DFS and iterative DFS visit the same vertices, but in **different** orders because a stack reverses neighbor processing.}} #card #graphs/traversals #dfs
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Exercises
-tags: [learning, dsa, graphs, exercises]
+tags: [topic/dsa, topic/graphs, kind/exercises]
 lastUpdated: 2026-05-15
 ---
 # Graphs — exercises & problem sets

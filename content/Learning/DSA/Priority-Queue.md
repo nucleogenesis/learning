@@ -1,6 +1,6 @@
 ---
 title: Priority-Queue
-tags: [learning, dsa, data-structures, priority-queue, heap]
+tags: [topic/dsa, topic/data-structures, kind/prereq]
 lastUpdated: 2026-05-15
 ---
 # Priority queue (binary heap)
@@ -269,27 +269,27 @@ If you can't, re-read the pop section.
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- Heap invariant (min-heap)? #card
+- Heap invariant (min-heap)? #card #dsa/priority-queue #heap
   - Every parent is ≤ both its children. The minimum is always at index 0.
-- Push complexity? #card
+- Push complexity? #card #dsa/priority-queue #complexity
   - `O(log n)` — sift up walks at most the tree height.
-- Pop (extract-min) complexity? #card
+- Pop (extract-min) complexity? #card #dsa/priority-queue #complexity
   - `O(log n)` — sift down walks at most the tree height.
-- Peek complexity? #card
+- Peek complexity? #card #dsa/priority-queue #complexity
   - `O(1)` — just read index 0.
-- Heapify complexity (build heap from arbitrary array)? #card
+- Heapify complexity (build heap from arbitrary array)? #card #dsa/priority-queue #heap #complexity
   - `O(n)` — start sift-down from the middle and work backward. Cheaper than `O(n log n)` because most nodes are near the bottom and have little room to sink.
-- Parent of index `i` (zero-indexed)? #card
+- Parent of index `i` (zero-indexed)? #card #dsa/priority-queue
   - `(i - 1) // 2`
-- Children of index `i` (zero-indexed)? #card
+- Children of index `i` (zero-indexed)? #card #dsa/priority-queue
   - Left: `2*i + 1`. Right: `2*i + 2`.
-- How to simulate a max-heap with a min-heap (Python)? #card
+- How to simulate a max-heap with a min-heap (Python)? #card #dsa/priority-queue #heap
   - Negate the priorities: push `-x`, un-negate when reading.
-- Why is heap shape a "complete binary tree"? #card
+- Why is heap shape a "complete binary tree"? #card #dsa/priority-queue #binary-tree #heap
   - Every level fully filled except possibly the last, which fills left-to-right. This guarantees the array packing has no gaps; index arithmetic always lands on real nodes.
-- Standard trick for handling stale entries (since binary heap has no efficient decrease-key)? #card
+- Standard trick for handling stale entries (since binary heap has no efficient decrease-key)? #card #dsa/priority-queue #heap
   - Lazy deletion: push the new better priority, leave the old entry in the heap. Skip it when it pops out if the cached value is now better. Adds `O(E)` extra entries in Dijkstra — still fast overall.
-- {{cloze The smallest element of a min-heap is always at array index **0**.}} #card
+- {{cloze The smallest element of a min-heap is always at array index **0**.}} #card #dsa/priority-queue #heap
 
 ---
 

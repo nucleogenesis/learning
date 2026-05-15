@@ -1,6 +1,6 @@
 ---
 title: TypeScript
-tags: [learning, typescript]
+tags: [topic/typescript, topic/type-system, kind/hub]
 lastUpdated: 2026-05-15
 ---
 # TypeScript — topic hub

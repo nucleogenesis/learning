@@ -1,6 +1,6 @@
 ---
 title: Traversals
-tags: [learning, dsa, trees, traversals]
+tags: [topic/dsa, topic/trees, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Tree traversals — DFS orders, level-order, Morris
@@ -516,27 +516,27 @@ If you can't, the "where do you do work relative to children" framing didn't lan
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- Pre-order recipe? #card
+- Pre-order recipe? #card #trees/traversals
   - **Root, left, right.** Do work at the node *before* recursing into children.
-- In-order recipe? #card
+- In-order recipe? #card #trees/traversals
   - **Left, root, right.** Do work *between* the two child recursions.
-- Post-order recipe? #card
+- Post-order recipe? #card #trees/traversals #dfs
   - **Left, right, root.** Do work *after* both child recursions.
-- In-order traversal of a **BST** produces? #card
+- In-order traversal of a **BST** produces? #card #trees/traversals
   - Keys in **ascending sorted order**. This is the classical "validate-a-BST" trick.
-- {{cloze **Level-order** traversal uses a **FIFO queue** and visits nodes in order of increasing depth.}} #card
-- {{cloze The "snapshot the queue size at the start of each iteration" trick is what lets level-order traversal group output by level.}} #card
-- When would you prefer **iterative** DFS to recursive DFS on a tree? #card
+- {{cloze **Level-order** traversal uses a **FIFO queue** and visits nodes in order of increasing depth.}} #card #trees/traversals #bfs
+- {{cloze The "snapshot the queue size at the start of each iteration" trick is what lets level-order traversal group output by level.}} #card #trees/traversals
+- When would you prefer **iterative** DFS to recursive DFS on a tree? #card #trees/traversals #dfs
   - When the tree is or might be deeply skewed (height > 1000-ish), causing recursive DFS to hit Python's recursion limit. The iterative version uses heap memory for the explicit stack instead.
-- Why is post-order the right traversal for evaluating an expression tree? #card
+- Why is post-order the right traversal for evaluating an expression tree? #card #trees/traversals #dfs
   - You can't apply an operator until you know its operands. The operands are children; post-order guarantees they're already computed before the parent runs.
-- {{cloze Pre-order on the **DFS tree** of a graph **is** graph DFS. Post-order on the DFS tree of a DAG gives reversed **topological** order.}} #card
-- What's the space complexity of recursive in-order traversal? #card
+- {{cloze Pre-order on the **DFS tree** of a graph **is** graph DFS. Post-order on the DFS tree of a DAG gives reversed **topological** order.}} #card #trees/traversals #dfs #topo-sort
+- What's the space complexity of recursive in-order traversal? #card #trees/traversals #complexity
   - `O(h)` where `h` is the tree height, due to the call stack. On a balanced tree that's `O(log n)`; on a skewed tree it's `O(n)`.
-- What's the space complexity of **Morris** traversal? #card
+- What's the space complexity of **Morris** traversal? #card #trees/traversals #morris-traversal #complexity
   - `O(1)` extra space. It temporarily rewires right-child pointers as "threads" back to in-order predecessors, then tears them down. Caveat: the tree is mutated mid-traversal.
-- {{cloze In-order traversal doesn't generalize cleanly to **n-ary** trees because "between left and right" requires exactly two children.}} #card
-- Why doesn't tree traversal need a `visited` set the way graph traversal does? #card
+- {{cloze In-order traversal doesn't generalize cleanly to **n-ary** trees because "between left and right" requires exactly two children.}} #card #trees/traversals
+- Why doesn't tree traversal need a `visited` set the way graph traversal does? #card #trees/traversals
   - Trees are acyclic. There's no way to revisit a node — every node has exactly one parent (in a rooted tree), and you can only reach it from above.
 
 ---

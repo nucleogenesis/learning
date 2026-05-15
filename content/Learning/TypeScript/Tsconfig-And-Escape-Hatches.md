@@ -1,6 +1,6 @@
 ---
 title: Tsconfig-And-Escape-Hatches
-tags: [learning, typescript, tsconfig]
+tags: [topic/typescript, topic/type-system, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Tsconfig and escape hatches
@@ -541,26 +541,26 @@ If you can't, the "compiler honesty about array access" framing didn't stick.
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What does `strict: true` enable? #card
+- What does `strict: true` enable? #card #ts/tsconfig
   - Seven flags: `strictNullChecks`, `noImplicitAny`, `strictFunctionTypes`, `strictBindCallApply`, `strictPropertyInitialization`, `alwaysStrict`, `noImplicitThis`. Treat as non-negotiable for new code.
-- {{cloze The single most important flag in TypeScript is **`strictNullChecks`** — it forces explicit handling of `null` and `undefined`.}} #card
-- What does `noUncheckedIndexedAccess` do? #card
+- {{cloze The single most important flag in TypeScript is **`strictNullChecks`** — it forces explicit handling of `null` and `undefined`.}} #card #ts/tsconfig
+- What does `noUncheckedIndexedAccess` do? #card #ts/tsconfig
   - Adds `| undefined` to every array and record index access. Catches "what if this index is out of bounds / this key is absent" at compile time. The most underused high-leverage flag in TS.
-- `noUncheckedIndexedAccess` vs `strict` — relationship? #card
+- `noUncheckedIndexedAccess` vs `strict` — relationship? #card #ts/tsconfig
   - Separate flags. `strict` does NOT include `noUncheckedIndexedAccess`. You have to turn it on explicitly. Many codebases turn on `strict` and stop, missing this lever.
-- {{cloze `exactOptionalPropertyTypes` distinguishes **`prop?: T`** (may be absent) from **`prop: T | undefined`** (must be present, may be undefined).}} #card
-- `moduleResolution` — when to use `bundler` vs `nodenext`? #card
+- {{cloze `exactOptionalPropertyTypes` distinguishes **`prop?: T`** (may be absent) from **`prop: T | undefined`** (must be present, may be undefined).}} #card #ts/tsconfig
+- `moduleResolution` — when to use `bundler` vs `nodenext`? #card #ts/tsconfig
   - `bundler` for frontend/app code that runs through Vite/esbuild/Webpack. `nodenext` for Node-targeted libraries and modern ESM-aware servers. `node10` only for legacy. Pick once per project; commit.
-- `@ts-expect-error` vs `@ts-ignore`? #card
+- `@ts-expect-error` vs `@ts-ignore`? #card #ts/tsconfig
   - `@ts-expect-error` errors if there's no error on the next line — self-cleaning when the underlying issue is fixed. `@ts-ignore` silently suppresses anything. **Always prefer `@ts-expect-error`.**
-- `unknown` vs `any` — when to use which? #card
+- `unknown` vs `any` — when to use which? #card #ts/tsconfig
   - `unknown`: "I don't know what this is, narrow before using." `any`: "I don't know what this is, and I don't care." Always prefer `unknown` at API boundaries — the compiler forces consumers to validate.
-- Why is `as User` after `JSON.parse(body)` a bug? #card
+- Why is `as User` after `JSON.parse(body)` a bug? #card #ts/tsconfig
   - There's no runtime check that the JSON matches the `User` shape. The cast tells the compiler a lie. Fix: validate first (`if (isUser(raw))`), or use a parsing library (Zod, io-ts) that does the check.
-- {{cloze The non-null assertion operator (`!`) is one of the most dangerous escape hatches — it claims something is non-null **without checking**. Prefer explicit null-checks.}} #card
-- One legitimate use of `as`? #card
+- {{cloze The non-null assertion operator (`!`) is one of the most dangerous escape hatches — it claims something is non-null **without checking**. Prefer explicit null-checks.}} #card #ts/tsconfig
+- One legitimate use of `as`? #card #ts/tsconfig
   - DOM access where you know more than the type system: `document.getElementById('app') as HTMLDivElement`. The compiler only knows it's `HTMLElement | null`; you know it's specifically a div. The cast encodes your additional knowledge.
-- Order to migrate an existing codebase to stricter flags? #card
+- Order to migrate an existing codebase to stricter flags? #card #ts/tsconfig
   - (1) `strict: true`. (2) `noUncheckedIndexedAccess`. (3) `noImplicitReturns`, `noFallthroughCasesInSwitch`. (4) `exactOptionalPropertyTypes` (most painful — last). Each as its own PR.
 
 ---

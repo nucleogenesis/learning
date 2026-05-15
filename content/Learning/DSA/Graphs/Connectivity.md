@@ -1,6 +1,6 @@
 ---
 title: Connectivity
-tags: [learning, dsa, graphs, connectivity]
+tags: [topic/dsa, topic/graphs, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Connectivity — components, cycles, bipartite
@@ -311,23 +311,23 @@ If you struggle, the undirected cycle detection section didn't fully land — re
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What's a **connected component**? #card
+- What's a **connected component**? #card #graphs/connectivity
   - A maximal set of vertices where every pair has a path between them. "Maximal" = can't be extended without breaking the property.
-- Algorithm to count connected components in an undirected graph? #card
+- Algorithm to count connected components in an undirected graph? #card #graphs/connectivity
   - Iterate all vertices; for each unvisited one, run BFS/DFS and increment a counter. `O(V + E)`.
-- Why does white/gray/black cycle detection fail on **undirected** graphs? #card
+- Why does white/gray/black cycle detection fail on **undirected** graphs? #card #graphs/connectivity #dfs #cycle-detection
   - Every undirected edge appears in both directions; revisiting the parent looks like a back edge. Fix: track the parent and skip it when checking GRAY neighbors.
-- Two algorithms for undirected cycle detection? #card
+- Two algorithms for undirected cycle detection? #card #graphs/connectivity #cycle-detection
   - DFS with parent tracking (`O(V + E)`), or Union-Find scanning edges (`O(E · α(V))`).
-- A graph is **bipartite** iff... #card
+- A graph is **bipartite** iff... #card #graphs/connectivity #bipartite
   - It has no odd-length cycle. Equivalently, it's 2-colorable.
-- Algorithm for bipartite check? #card
+- Algorithm for bipartite check? #card #graphs/connectivity #bipartite
   - BFS from each unvisited vertex, alternating colors layer by layer. If you ever see an edge inside a color class, not bipartite.
-- {{cloze A graph is bipartite **if and only if** it has no **odd-length cycle**.}} #card
-- Is a tree always bipartite? #card
+- {{cloze A graph is bipartite **if and only if** it has no **odd-length cycle**.}} #card #graphs/connectivity #bipartite
+- Is a tree always bipartite? #card #graphs/connectivity #bipartite
   - Yes — trees have no cycles, so no odd cycles. Color by depth parity.
-- {{cloze For **directed** graphs, the right concept is **strongly connected components** (SCC), not plain connected components.}} #card
-- Cycle detection: when to use **DSU** vs **DFS with parent**? #card
+- {{cloze For **directed** graphs, the right concept is **strongly connected components** (SCC), not plain connected components.}} #card #graphs/connectivity #scc
+- Cycle detection: when to use **DSU** vs **DFS with parent**? #card #graphs/connectivity #dfs #dsu #cycle-detection
   - DSU if you already have it (e.g., for Kruskal's MST). DFS-with-parent if you don't want to import another data structure.
 
 ---

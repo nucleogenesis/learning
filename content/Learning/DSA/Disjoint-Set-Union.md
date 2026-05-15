@@ -1,6 +1,6 @@
 ---
 title: Disjoint-Set-Union
-tags: [learning, dsa, data-structures, dsu, union-find]
+tags: [topic/dsa, topic/data-structures, kind/prereq]
 lastUpdated: 2026-05-15
 ---
 # Disjoint-Set-Union (Union-Find)
@@ -202,22 +202,22 @@ If you can't, re-read the optimizations section.
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- The two core DSU operations? #card
+- The two core DSU operations? #card #dsa/dsu #dsu
   - `find(x)` — return the root of x's set. `union(x, y)` — merge the sets containing x and y.
-- Amortized time per DSU operation with both optimizations? #card
+- Amortized time per DSU operation with both optimizations? #card #dsa/dsu #dsu
   - `O(α(n))` — inverse Ackermann, effectively constant (≤ 4 for any reasonable n).
-- The two optimizations DSU needs to achieve near-constant time? #card
+- The two optimizations DSU needs to achieve near-constant time? #card #dsa/dsu #dsu
   - **Path compression** (flatten paths during `find`) and **union by rank/size** (attach smaller tree under larger).
-- What does **path compression** do? #card
+- What does **path compression** do? #card #dsa/dsu #dsu
   - On a `find(x)` call, re-parents every node on the path from `x` to the root directly to the root. Subsequent finds on those nodes are O(1).
-- What's the **root** in DSU? #card
+- What's the **root** in DSU? #card #dsa/dsu #dsu
   - An element whose parent is itself: `parent[x] == x`. Two elements are in the same set iff they have the same root.
-- {{cloze With **both** path compression and union-by-rank, DSU operations are `O(α(n))` — effectively constant.}} #card
-- Without union-by-rank, what's the worst case? #card
+- {{cloze With **both** path compression and union-by-rank, DSU operations are `O(α(n))` — effectively constant.}} #card #dsa/dsu #dsu #complexity
+- Without union-by-rank, what's the worst case? #card #dsa/dsu #dsu
   - A linear chain: every `find` takes `O(n)`. Path compression alone helps but doesn't fully fix it.
-- One non-graph use of DSU? #card
+- One non-graph use of DSU? #card #dsa/dsu #dsu
   - Flood fill in image processing, percolation simulations, dynamic connectivity queries, Tarjan's offline LCA.
-- How does Kruskal's MST use DSU? #card
+- How does Kruskal's MST use DSU? #card #dsa/dsu #kruskal #mst #dsu
   - To check whether adding a candidate edge would create a cycle: if both endpoints have the same root, skip the edge; otherwise add it and union.
 
 ---
