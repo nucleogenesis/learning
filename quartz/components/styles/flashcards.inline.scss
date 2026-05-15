@@ -409,3 +409,85 @@ span.cloze {
   font-size: 0.85em;
   color: var(--gray);
 }
+
+/* /review tag filter UI. */
+
+.review-filter-area {
+  margin-bottom: 1.2rem;
+}
+.review-filter {
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  padding: 0.7rem 0.9rem;
+  background: color-mix(in srgb, var(--lightgray) 18%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.review-filter-label {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gray);
+}
+.review-tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.review-tag-chip {
+  border: 1px solid var(--lightgray);
+  background: transparent;
+  color: var(--darkgray);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+  font-family: inherit;
+}
+.review-tag-chip:hover {
+  border-color: var(--secondary);
+  color: var(--dark);
+}
+.review-tag-chip.is-on {
+  background: color-mix(in srgb, var(--secondary) 22%, transparent);
+  border-color: var(--secondary);
+  color: var(--dark);
+}
+.review-tag-empty {
+  color: var(--gray);
+  font-size: 0.85em;
+  font-style: italic;
+}
+.review-combinator {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85em;
+  color: var(--darkgray);
+}
+.review-combinator label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  cursor: pointer;
+}
+.review-counts {
+  font-size: 0.8em;
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+}
+.review-clear-filter {
+  border: 1px solid var(--lightgray);
+  background: transparent;
+  color: var(--darkgray);
+  border-radius: 4px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.85em;
+  cursor: pointer;
+  margin-top: 0.4rem;
+}
+.review-clear-filter:hover {
+  border-color: var(--secondary);
+  color: var(--dark);
+}
