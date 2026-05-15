@@ -1,26 +1,163 @@
+/**
+ * Client-side behavior for flashcards + cloze.
+ *
+ * Cloze: click / Space / Enter toggles `.revealed` on `span.cloze`.
+ *
+ * Cards: each `li.flashcard[data-card-id]` carries a `.flashcard-srs` button
+ *   row (Again/Hard/Good/Easy) and a `.flashcard-due` text line. SM-2 state
+ *   lives in localStorage under `learning-notes-srs-v1`, keyed by card id.
+ *   On a rating click, schedule advances and the due-line updates.
+ */
+
+const SRS_STORE = "learning-notes-srs-v1"
+
+type Rating = "again" | "hard" | "good" | "easy"
+
+type CardState = {
+  ef: number // ease factor; SM-2 default 2.5, floor 1.3
+  reps: number // consecutive non-Again ratings
+  intervalDays: number // days until next review
+  dueMs: number // epoch ms
+  lastReviewMs: number // epoch ms
+}
+
+type Store = Record<string, CardState>
+
+const DAY_MS = 24 * 60 * 60 * 1000
+
+function loadStore(): Store {
+  try {
+    const raw = localStorage.getItem(SRS_STORE)
+    if (!raw) return {}
+    return JSON.parse(raw) as Store
+  } catch {
+    return {}
+  }
+}
+
+function saveStore(store: Store) {
+  try {
+    localStorage.setItem(SRS_STORE, JSON.stringify(store))
+  } catch {
+    // quota or sandboxed iframe — silently ignore
+  }
+}
+
+function defaultState(nowMs: number): CardState {
+  return {
+    ef: 2.5,
+    reps: 0,
+    intervalDays: 0,
+    dueMs: nowMs,
+    lastReviewMs: 0,
+  }
+}
+
+function nextState(prev: CardState, rating: Rating, nowMs: number): CardState {
+  // Simplified SM-2 with 4 buttons. Again resets; Hard slows the interval;
+  // Good is the standard SM-2 step; Easy bonuses interval and ease.
+  let { ef, reps, intervalDays } = prev
+  if (rating === "again") {
+    reps = 0
+    intervalDays = 1
+    ef = Math.max(1.3, ef - 0.2)
+  } else if (rating === "hard") {
+    reps += 1
+    intervalDays = Math.max(1, Math.round((intervalDays || 1) * 1.2))
+    ef = Math.max(1.3, ef - 0.15)
+  } else if (rating === "good") {
+    reps += 1
+    if (reps === 1) intervalDays = 1
+    else if (reps === 2) intervalDays = 6
+    else intervalDays = Math.round(intervalDays * ef)
+  } else {
+    // easy
+    reps += 1
+    if (reps === 1) intervalDays = 4
+    else if (reps === 2) intervalDays = 7
+    else intervalDays = Math.round(intervalDays * ef * 1.3)
+    ef = ef + 0.15
+  }
+  return {
+    ef,
+    reps,
+    intervalDays,
+    dueMs: nowMs + intervalDays * DAY_MS,
+    lastReviewMs: nowMs,
+  }
+}
+
+function formatDue(state: CardState, nowMs: number): string {
+  if (state.lastReviewMs === 0) return ""
+  const diffDays = Math.round((state.dueMs - nowMs) / DAY_MS)
+  if (diffDays <= 0) return "Due now"
+  if (diffDays === 1) return "Next review: tomorrow"
+  if (diffDays < 7) return `Next review: in ${diffDays} days`
+  if (diffDays < 30) return `Next review: in ${Math.round(diffDays / 7)} weeks`
+  return `Next review: in ${Math.round(diffDays / 30)} months`
+}
+
+function setupCards() {
+  const store = loadStore()
+  const cards = document.querySelectorAll<HTMLElement>("li.flashcard[data-card-id]")
+  cards.forEach((card) => {
+    const id = card.getAttribute("data-card-id")
+    if (!id) return
+
+    const dueEl = card.querySelector<HTMLElement>(".flashcard-due")
+    const refresh = () => {
+      const state = store[id]
+      if (dueEl) dueEl.textContent = state ? formatDue(state, Date.now()) : ""
+      if (state) {
+        card.classList.toggle("is-due", state.dueMs <= Date.now())
+        card.classList.toggle("is-reviewed", true)
+      }
+    }
+    refresh()
+
+    const onClick = (e: Event) => {
+      const target = e.target as HTMLElement
+      if (!target.classList.contains("srs-btn")) return
+      const rating = target.dataset.rating as Rating | undefined
+      if (!rating) return
+      const now = Date.now()
+      const current = store[id] ?? defaultState(now)
+      store[id] = nextState(current, rating, now)
+      saveStore(store)
+      refresh()
+    }
+
+    card.addEventListener("click", onClick)
+    window.addCleanup(() => card.removeEventListener("click", onClick))
+  })
+}
+
 function toggleCloze(this: HTMLElement) {
   this.classList.toggle("revealed")
   const revealed = this.classList.contains("revealed")
   this.setAttribute("aria-label", revealed ? "Click to hide" : "Click to reveal")
 }
 
-function onKey(this: HTMLElement, ev: KeyboardEvent) {
+function onClozeKey(this: HTMLElement, ev: KeyboardEvent) {
   if (ev.key === " " || ev.key === "Enter") {
     ev.preventDefault()
     toggleCloze.call(this)
   }
 }
 
-function setupFlashcards() {
+function setupCloze() {
   const clozes = document.querySelectorAll<HTMLElement>("span.cloze")
   clozes.forEach((el) => {
     el.addEventListener("click", toggleCloze)
-    el.addEventListener("keydown", onKey)
+    el.addEventListener("keydown", onClozeKey)
     window.addCleanup(() => {
       el.removeEventListener("click", toggleCloze)
-      el.removeEventListener("keydown", onKey)
+      el.removeEventListener("keydown", onClozeKey)
     })
   })
 }
 
-document.addEventListener("nav", setupFlashcards)
+document.addEventListener("nav", () => {
+  setupCloze()
+  setupCards()
+})

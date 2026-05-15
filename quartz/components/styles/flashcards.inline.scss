@@ -63,6 +63,62 @@ li.flashcard {
       margin-bottom: 0;
     }
   }
+
+  > .flashcard-srs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--lightgray);
+  }
+
+  > .flashcard-due {
+    margin-top: 0.4rem;
+    font-size: 0.85em;
+    color: var(--gray);
+    min-height: 1em;
+  }
+}
+
+button.srs-btn {
+  border: 1px solid var(--lightgray);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--dark);
+  font-size: 0.85em;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+  transition: background-color 0.1s, border-color 0.1s;
+
+  &:hover {
+    border-color: var(--secondary);
+    background-color: color-mix(in srgb, var(--secondary) 8%, transparent);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+  }
+
+  &.srs-again {
+    border-color: color-mix(in srgb, #d9534f 60%, var(--lightgray));
+    &:hover {
+      background-color: color-mix(in srgb, #d9534f 14%, transparent);
+    }
+  }
+  &.srs-easy {
+    border-color: color-mix(in srgb, var(--tertiary) 60%, var(--lightgray));
+    &:hover {
+      background-color: color-mix(in srgb, var(--tertiary) 14%, transparent);
+    }
+  }
+}
+
+li.flashcard.is-reviewed > .flashcard-details {
+  border-color: color-mix(in srgb, var(--secondary) 40%, var(--lightgray));
+}
+li.flashcard.is-due > .flashcard-details {
+  border-color: color-mix(in srgb, #d9534f 50%, var(--lightgray));
 }
 
 /* Cloze deletions — text blanked by CSS until clicked. */
