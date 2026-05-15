@@ -335,3 +335,77 @@ span.cloze {
   margin-left: auto;
   opacity: 0.7;
 }
+
+/* /review page UI. */
+
+#review-root {
+  margin-top: 1rem;
+}
+.review-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.85em;
+  color: var(--gray);
+  margin-bottom: 0.6rem;
+}
+.review-progress {
+  font-variant-numeric: tabular-nums;
+}
+.review-source {
+  color: var(--secondary);
+  text-decoration: none;
+}
+.review-source:hover {
+  text-decoration: underline;
+}
+.review-card-host {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.review-card-host > li.flashcard {
+  margin-left: 0;
+}
+.review-card-host .flashcard-details {
+  border-width: 2px;
+}
+.review-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+.review-skip {
+  border: 1px solid var(--lightgray);
+  background: transparent;
+  color: var(--gray);
+  border-radius: 4px;
+  font-size: 0.85em;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+.review-skip:hover {
+  border-color: var(--secondary);
+  color: var(--dark);
+}
+.review-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  border: 1px dashed var(--lightgray);
+  border-radius: 6px;
+  color: var(--darkgray);
+}
+.review-empty h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+}
+.review-next {
+  color: var(--gray);
+  font-size: 0.9em;
+}
+.review-meta {
+  margin-top: 1.2rem;
+  font-size: 0.85em;
+  color: var(--gray);
+}
