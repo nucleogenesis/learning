@@ -12,6 +12,8 @@ import flashcardsScript from "../../components/scripts/flashcards.inline"
 import checkboxesScript from "../../components/scripts/checkboxes.inline"
 // @ts-ignore
 import explorerProgressScript from "../../components/scripts/explorer-progress.inline"
+// @ts-ignore
+import annotationsScript from "../../components/scripts/annotations.inline"
 import flashcardsStyle from "../../components/styles/flashcards.inline.scss"
 
 const CARD_TAG_RE = /(^|\s)#card\b/
@@ -157,10 +159,11 @@ export const Flashcards: QuartzTransformerPlugin = () => ({
   htmlPlugins() {
     return [
       () => (tree: HtmlRoot, file) => {
-        // Enable GFM task-list checkboxes (Quartz's enableCheckbox option does
-        // the same job; we do it here so we can also stamp a stable
-        // `data-todo-id` for the state-driven persistence layer).
         const slug = (file.data.slug ?? "") as string
+
+        // 1) Enable GFM task-list checkboxes (Quartz's enableCheckbox option
+        //    does the same job; we do it here so we can also stamp a stable
+        //    `data-todo-id` for the state-driven persistence layer).
         let idx = 0
         visit(tree, "element", (node: HastElement) => {
           if (node.tagName !== "input") return
@@ -175,6 +178,26 @@ export const Flashcards: QuartzTransformerPlugin = () => ({
             "data-todo-id": `${slug}/${idx}`,
           }
           idx += 1
+        })
+
+        // 2) Tag annotatable blocks with a stable `data-block-id`. Annotation
+        //    eligibility: paragraphs, code blocks, blockquotes, and list items
+        //    that aren't already wrapped as flashcards or Show-answer details.
+        //    The runtime script reads `state.annots[<blockId>]` and renders an
+        //    icon/marker/editor per block.
+        visit(tree, "element", (node: HastElement) => {
+          if (!isAnnotatable(node)) return
+          const text = hastElementText(node).trim()
+          if (text.length === 0) return
+          const blockId = fnv1a(slug + "::" + text)
+          const props = (node.properties ??= {})
+          const existingClasses = Array.isArray(props.className)
+            ? (props.className as string[])
+            : typeof props.className === "string"
+              ? [props.className]
+              : []
+          props.className = [...existingClasses, "annotatable"]
+          ;(props as Record<string, unknown>)["data-block-id"] = blockId
         })
       },
     ]
@@ -199,6 +222,11 @@ export const Flashcards: QuartzTransformerPlugin = () => ({
       },
       {
         script: explorerProgressScript,
+        loadTime: "afterDOMReady",
+        contentType: "inline",
+      },
+      {
+        script: annotationsScript,
         loadTime: "afterDOMReady",
         contentType: "inline",
       },
@@ -249,4 +277,33 @@ function fnv1a(s: string): string {
     h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0
   }
   return h.toString(16).padStart(8, "0")
+}
+
+const ANNOTATABLE_TAGS = new Set(["p", "blockquote", "pre", "li"])
+const SKIP_LI_CLASSES = new Set(["flashcard", "show-answer"])
+
+function isAnnotatable(node: HastElement): boolean {
+  if (!ANNOTATABLE_TAGS.has(node.tagName)) return false
+  // Skip list items that are already wrapped (flashcards, show-answer
+  // collapsibles); their inner content has its own UX and adding the icon
+  // would compete with the disclosure-toggle hit area.
+  if (node.tagName === "li") {
+    const cls = Array.isArray(node.properties?.className)
+      ? (node.properties!.className as string[])
+      : typeof node.properties?.className === "string"
+        ? [node.properties!.className as string]
+        : []
+    if (cls.some((c) => SKIP_LI_CLASSES.has(c))) return false
+  }
+  return true
+}
+
+function hastElementText(node: HastElement | unknown): string {
+  if (!node || typeof node !== "object") return ""
+  const n = node as { type?: string; value?: string; children?: unknown[] }
+  if (n.type === "text") return n.value ?? ""
+  if (!n.children) return ""
+  let out = ""
+  for (const child of n.children) out += hastElementText(child)
+  return out
 }
