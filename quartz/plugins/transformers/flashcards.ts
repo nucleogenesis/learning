@@ -10,6 +10,14 @@ import flashcardsStyle from "../../components/styles/flashcards.inline.scss"
 const CARD_TAG_RE = /(^|\s)#card\b/
 const CLOZE_RE = /\{\{cloze ([\s\S]+?)\}\}/g
 
+// A list-item whose first paragraph reads "Show <something>" AND has body
+// children (the answer) becomes a click-to-reveal <details>. Matches the
+// Logseq convention used on Basics/Traversals/etc. quick-check sections:
+//   - **Q1**: …question…
+//   - Show answer to Q1
+//     - answer body
+const SHOW_ANSWER_RE = /^\s*Show\b/
+
 // `- TODO X` / `- DONE X` / `- LATER X` / `- DOING X` / `- RECHECK X` at the start
 // of list items become GFM task list items. Logseq uses these markers; on the web
 // they become real checkboxes (and Quartz's OFM enableCheckbox makes them
@@ -93,6 +101,49 @@ export const Flashcards: QuartzTransformerPlugin = () => ({
 
           node.children = [open, question, midClose, ...answer, close]
         })
+
+        // Show-answer collapsibles. Same shape as cards but without the
+        // SRS row, and detection by leading "Show " text rather than #card.
+        visit(tree, "listItem", (node: ListItem) => {
+          if (node.children.length < 2) return // need a body, not just a label
+          const first = node.children[0]
+          if (first.type !== "paragraph") return
+
+          // Skip list items the card pass already wrapped.
+          const existingClasses =
+            (typeof node.data?.hProperties === "object" &&
+            node.data?.hProperties !== null &&
+            Array.isArray((node.data.hProperties as Record<string, unknown>).className)
+              ? ((node.data.hProperties as Record<string, unknown>).className as string[])
+              : []) ?? []
+          if (existingClasses.includes("flashcard") || existingClasses.includes("show-answer")) return
+
+          // Plain-text-only match on the label paragraph (don't trigger on a
+          // backticked or linked "Show ..." inside prose).
+          if (!paragraphStartsWith(first, SHOW_ANSWER_RE)) return
+
+          const data = (node.data ??= {})
+          const hProps =
+            typeof data.hProperties === "object" && data.hProperties !== null
+              ? (data.hProperties as Record<string, unknown>)
+              : {}
+          data.hProperties = {
+            ...hProps,
+            className: [...existingClasses, "show-answer"],
+          }
+
+          const [label, ...body] = node.children
+          const open: Html = {
+            type: "html",
+            value: '<details class="show-answer-details"><summary class="show-answer-label">',
+          }
+          const midClose: Html = {
+            type: "html",
+            value: '</summary><div class="show-answer-body">',
+          }
+          const close: Html = { type: "html", value: "</div></details>" }
+          node.children = [open, label, midClose, ...body, close]
+        })
       },
     ]
   },
@@ -120,6 +171,11 @@ function paragraphHasCardTag(para: Paragraph): boolean {
     }
   }
   return false
+}
+
+function paragraphStartsWith(para: Paragraph, re: RegExp): boolean {
+  const first = para.children[0]
+  return first?.type === "text" && re.test((first as Text).value)
 }
 
 function stripCardTag(para: Paragraph) {
