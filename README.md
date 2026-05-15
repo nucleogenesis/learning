@@ -4,7 +4,7 @@ Public study notes for DSA and other topics I'm learning.
 
 Source of truth is a private [Logseq](https://logseq.com/) graph; the `Learning/**` namespace is published here via an MCP-driven publish skill. Build: [Quartz](https://quartz.jzhao.xyz/).
 
-Site: https://nucleogenesis.github.io/learning/ *(coming soon — repo bootstrap in progress)*
+Site: https://learning.nucleogenesis.org/
 
 ## Repo status
 
