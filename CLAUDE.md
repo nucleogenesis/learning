@@ -34,5 +34,5 @@ npx quartz build --serve   # live-reload dev server on :8080
 
 ## Deploy
 
-`main` → GitHub Actions → GitHub Pages at https://learn.nucleogenesis.org/ (custom domain; `nucleogenesis.github.io/learning/` still resolves as a backup).
+`main` → GitHub Actions → GitHub Pages at https://learning.nucleogenesis.org/ (custom domain; `nucleogenesis.github.io/learning/` still resolves as a backup).
 PRs trigger build-only checks (no deploy).
