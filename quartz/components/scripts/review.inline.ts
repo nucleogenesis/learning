@@ -40,8 +40,10 @@ let progress = { reviewed: 0, total: 0 }
 async function loadCards(): Promise<CardEntry[]> {
   if (cachedCards) return cachedCards
   try {
-    const base = document.querySelector<HTMLBaseElement>("base")?.href ?? "/"
-    const url = new URL("cards-index.json", base).toString()
+    // A leading-slash path resolves to the origin regardless of whether the
+    // current URL has a trailing slash (`/review` vs `/review/`), which
+    // matters because Quartz doesn't normalize that consistently.
+    const url = new URL("/cards-index.json", document.baseURI).toString()
     const res = await fetch(url, { credentials: "omit" })
     if (!res.ok) throw new Error(`fetch failed: ${res.status}`)
     cachedCards = (await res.json()) as CardEntry[]
