@@ -1,6 +1,6 @@
 ---
 title: DSA
-tags: [learning, dsa, index]
+tags: [topic/dsa, kind/index]
 lastUpdated: 2026-05-15
 ---
 # Learning/DSA

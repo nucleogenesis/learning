@@ -1,6 +1,6 @@
 ---
 title: Generics
-tags: [learning, typescript, generics]
+tags: [topic/typescript, topic/type-system, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Generics — true polymorphism vs disguised `any`
@@ -441,14 +441,14 @@ If you can't, the "useful generic vs disguised `any`" diagnostic didn't land. Re
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- Diagnostic for whether a generic earns its keep? #card
+- Diagnostic for whether a generic earns its keep? #card #ts/generics
   - Count the appearances of the type parameter in the signature. If it appears once, the generic is probably disguising `unknown`/`any`. If it appears 2+ times, it's preserving a real type relationship.
-- {{cloze A type parameter appearing in **input only** is doing nothing; if it appears in input AND output, it's doing real work.}} #card
-- What does `K extends keyof T` constrain? #card
+- {{cloze A type parameter appearing in **input only** is doing nothing; if it appears in input AND output, it's doing real work.}} #card #ts/generics
+- What does `K extends keyof T` constrain? #card #ts/generics
   - It pins `K` to be one of the keys of `T`. Combined with an indexed access type `T[K]`, this is the foundation of type-safe property access (`pick`, `getProp`, etc.).
-- What's an **indexed access type**? #card
+- What's an **indexed access type**? #card #ts/generics
   - `T[K]` — the type of `T`'s property at key `K`. `User['name']` = `string`. Works for unions of keys too: `User['name' | 'id']` = `string | string`.
-- Default type parameter syntax? #card
+- Default type parameter syntax? #card #ts/generics
 
 ```ts
 
@@ -459,21 +459,21 @@ type R<E = Error> = { ok: false; error: E };
 ```
   - Useful for unknown-like defaults, and for adding a new type parameter to an existing API without breaking callers.
 
-- {{cloze Function parameter types are **contravariant**; function return types are **covariant**.}} #card
+- {{cloze Function parameter types are **contravariant**; function return types are **covariant**.}} #card #ts/generics
 
-- Why are arrays unsoundly covariant in TS? #card
+- Why are arrays unsoundly covariant in TS? #card #ts/generics
   - `Dog[]` is assignable to `Animal[]`, but then you can push a non-Dog `Animal` into the `Animal[]` (which is the same array), breaking `Dog[]`. The fix in your own code: use `readonly Dog[]` when you don't intend to mutate — that's covariant *safely*.
 
-- Two reasons to prefer `unknown` over a single-position `<T>`? #card
+- Two reasons to prefer `unknown` over a single-position `<T>`? #card #ts/generics
   - (1) Forces callers to validate before use. (2) Doesn't lie about a runtime guarantee that doesn't exist. Generic returning `T` from `JSON.parse` is the canonical anti-example.
 
-- The `Parameters<F>` and `ReturnType<F>` utility types do what? #card
+- The `Parameters<F>` and `ReturnType<F>` utility types do what? #card #ts/generics
   - Extract the parameter tuple type and the return type of a function type. Most useful inside generic constraints over functions (HOFs, middleware, decorators).
 
-- One smell that suggests you should reach for a higher-order generic? #card
+- One smell that suggests you should reach for a higher-order generic? #card #ts/generics
   - "Wrap this function and preserve its full signature." Logging, debouncing, retrying, caching, telemetry — all wrapper patterns where the wrapped function's parameters and return type must flow through unchanged.
 
-- {{cloze A type parameter without a constraint is the universal type — you can pass anything in, but you can't call any methods on it.}} #card
+- {{cloze A type parameter without a constraint is the universal type — you can pass anything in, but you can't call any methods on it.}} #card #ts/generics
 
 ---
 

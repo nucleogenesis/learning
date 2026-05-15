@@ -1,6 +1,6 @@
 ---
 title: Basics
-tags: [learning, dsa, graphs, basics]
+tags: [topic/dsa, topic/graphs, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Graphs — basics & representations
@@ -161,12 +161,9 @@ def add_edge(graph, u, v):
 - Show the answer
 
 ```python
-
-graph[u].append(v)
-
-graph[v].append(u)
-
-```
+- graph[u].append(v)
+- graph[v].append(u)
+- ```
 - The symmetry of those two lines *is* the undirected-ness of the graph.
 
 #### From scratch (no scaffold)
@@ -179,10 +176,10 @@ The implementation below tries to build an **undirected** adjacency list. There 
 
 ```python
 def build(edges):
-  graph = {}
-  for u, v in edges:
-      graph[u] = graph.get(u, []) + [v]
-  return graph
+ graph = {}
+ for u, v in edges:
+     graph[u] = graph.get(u, []) + [v]
+ return graph
 ```
 
 - Show the bugs
@@ -204,25 +201,25 @@ If you can't, the trade-offs table didn't land. Re-read it, then try again.
 
 These get surfaced automatically by Logseq's flashcard queue. **Don't drill them on your first read of this page** — cramming on the same day you encoded the material is what the spacing effect specifically warns against. They show up in your queue tomorrow; drill them then.
 
-- What's the difference between a **path** and a **walk**? #card
+- What's the difference between a **path** and a **walk**? #card #graphs/basics
   - A walk may repeat vertices/edges. A path may not.
-- A **DAG** is... #card
+- A **DAG** is... #card #graphs/basics #topo-sort
   - A **D**irected **A**cyclic **G**raph. Required for topological sort.
-- A tree on `n` vertices has how many edges? #card
+- A tree on `n` vertices has how many edges? #card #graphs/basics
   - Exactly `n − 1`.
-- {{cloze The number of edges touching a vertex in an undirected graph is its **degree**.}} #card
-- {{cloze In a directed graph, incoming edges count as **in-degree**, outgoing as **out-degree**.}} #card
-- Adjacency **list** space complexity? #card
+- {{cloze The number of edges touching a vertex in an undirected graph is its **degree**.}} #card #graphs/basics
+- {{cloze In a directed graph, incoming edges count as **in-degree**, outgoing as **out-degree**.}} #card #graphs/basics
+- Adjacency **list** space complexity? #card #graphs/basics #complexity
   - `O(V + E)`
-- Adjacency **matrix** space complexity? #card
+- Adjacency **matrix** space complexity? #card #graphs/basics #complexity
   - `O(V²)` — independent of `E`.
-- Best representation for a **sparse** graph? #card
+- Best representation for a **sparse** graph? #card #graphs/basics
   - Adjacency list.
-- Best representation when you need **O(1) edge-existence checks**? #card
+- Best representation when you need **O(1) edge-existence checks**? #card #graphs/basics #complexity
   - Adjacency matrix.
-- Which representation does **Kruskal's MST** want? #card
+- Which representation does **Kruskal's MST** want? #card #graphs/basics #kruskal #mst
   - Edge list (so you can sort by weight).
-- {{cloze Iterating all neighbors of `v` is `O(deg(v))` in an adjacency **list**, but `O(V)` in an adjacency **matrix**.}} #card
+- {{cloze Iterating all neighbors of `v` is `O(deg(v))` in an adjacency **list**, but `O(V)` in an adjacency **matrix**.}} #card #graphs/basics #complexity
 
 ---
 

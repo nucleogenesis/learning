@@ -1,6 +1,6 @@
 ---
 title: Graphs
-tags: [learning, dsa, graphs]
+tags: [topic/dsa, topic/graphs, kind/hub]
 lastUpdated: 2026-05-15
 ---
 # Graphs — topic hub

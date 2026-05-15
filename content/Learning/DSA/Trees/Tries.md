@@ -1,6 +1,6 @@
 ---
 title: Tries
-tags: [learning, dsa, trees, tries]
+tags: [topic/dsa, topic/trees, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Tries — prefix trees
@@ -387,27 +387,27 @@ If you can't, the prefix-walking story didn't land. Re-read the `starts_with` an
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What does each **edge** of a trie represent? #card
+- What does each **edge** of a trie represent? #card #trees/tries #trie
   - A single character. A root-to-node path spells a prefix.
-- What's the role of the **end-of-word** flag? #card
+- What's the role of the **end-of-word** flag? #card #trees/tries
   - Distinguishes "this node *is* a stored word" from "this node is just a prefix of some stored word." Without it, `search` and `starts_with` are indistinguishable.
-- Time complexity of trie insert? #card
+- Time complexity of trie insert? #card #trees/tries #trie #complexity
   - `O(L)` where L is the word length. Independent of how many words are already stored.
-- Time complexity of trie `starts_with(prefix)`? #card
+- Time complexity of trie `starts_with(prefix)`? #card #trees/tries #trie #complexity
   - `O(P)` where P is the prefix length. Independent of how many words match.
-- Enumerating all words with a given prefix — complexity? #card
+- Enumerating all words with a given prefix — complexity? #card #trees/tries #complexity
   - `O(P + total characters in all matches)`. Optimal — you can't enumerate K matches in less than `O(K)` work.
-- {{cloze A trie's space cost is **shared** across common prefixes; total nodes ≈ unique prefix paths, not sum of word lengths.}} #card
-- When would you choose a **trie** over a **hash set**? #card
+- {{cloze A trie's space cost is **shared** across common prefixes; total nodes ≈ unique prefix paths, not sum of word lengths.}} #card #trees/tries #trie
+- When would you choose a **trie** over a **hash set**? #card #trees/tries #trie
   - When you need prefix queries (autocomplete, longest-prefix-match, sorted prefix enumeration). Hash sets only answer exact-match queries.
-- What's a **radix tree** (Patricia trie)? #card
+- What's a **radix tree** (Patricia trie)? #card #trees/tries #trie
   - A trie where chains of single-child nodes are collapsed into one edge labeled by the substring. Saves space when long stretches of bits/chars have no branching. Used in IP routing tables.
-- One real-world use case for tries other than autocomplete? #card
+- One real-world use case for tries other than autocomplete? #card #trees/tries
   - IP routing (longest-prefix match). Also: T9 prediction, Scrabble solvers, DNA pattern matching (via suffix tries), spell-checkers (often DAWGs in practice).
-- For a fixed alphabet (lowercase English), what's a memory-efficient way to store children? #card
+- For a fixed alphabet (lowercase English), what's a memory-efficient way to store children? #card #trees/tries
   - A 26-slot array indexed by `ord(c) - ord('a')`, instead of a dict. Faster lookup, less overhead per node, but wastes slots for unused letters.
-- {{cloze The **leftmost** trie variant — collapsing chains of single-child nodes — is called a **radix tree** or **Patricia trie**.}} #card
-- Why doesn't deleting a word from a trie usually require restructuring? #card
+- {{cloze The **leftmost** trie variant — collapsing chains of single-child nodes — is called a **radix tree** or **Patricia trie**.}} #card #trees/tries #trie
+- Why doesn't deleting a word from a trie usually require restructuring? #card #trees/tries #trie
   - You just unset its `is_end` flag. The shared prefix nodes are still needed for other words. You *could* prune nodes that become unused, but most implementations don't bother.
 
 ---

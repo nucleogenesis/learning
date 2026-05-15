@@ -1,6 +1,6 @@
 ---
 title: Template-Literal-Types
-tags: [learning, typescript, template-literal-types]
+tags: [topic/typescript, topic/type-system, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Template literal types — strings in the type system
@@ -367,14 +367,14 @@ If you can't, the "deriving instead of enumerating" framing didn't stick.
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What's a **template literal type**? #card
+- What's a **template literal type**? #card #ts/template-literals
   - A string-shaped type using backticks and `${...}` placeholders. Acts like a JS template literal but at the type level. Used to compose string literal types and match them with `infer`.
-- {{cloze Template literal types **distribute** over unions, producing the **cartesian product** when there are multiple union placeholders.}} #card
-- Four intrinsic string types? #card
+- {{cloze Template literal types **distribute** over unions, producing the **cartesian product** when there are multiple union placeholders.}} #card #ts/template-literals
+- Four intrinsic string types? #card #ts/template-literals
   - `Uppercase<S>`, `Lowercase<S>`, `Capitalize<S>`, `Uncapitalize<S>`. Built-in case-manipulation at the type level. Common use: key remapping in mapped types to produce getter/setter names.
-- Why does `Capitalize<string & K>` show up when remapping keys? #card
+- Why does `Capitalize<string & K>` show up when remapping keys? #card #ts/template-literals
   - `K` is `keyof T` which is `string | number | symbol`. Template literals don't accept `symbol` directly. Intersecting with `string` narrows to just string keys, satisfying the constraint.
-- How do you extract a substring with `infer`? #card
+- How do you extract a substring with `infer`? #card #ts/template-literals #infer
 
 ```ts
 
@@ -383,7 +383,7 @@ type ExtractParam<S> = S extends `:${infer P}` ? P : never;
 ```
   - The `infer P` captures whatever fills the placeholder in the pattern. Used to pull route params, prefixes, suffixes, segments.
 
-- Write `Split<S, D>` to split a string literal type by a delimiter. #card
+- Write `Split<S, D>` to split a string literal type by a delimiter. #card #ts/template-literals
   - ```ts
     type Split<S, D extends string> = S extends `${infer Head}${D}${infer Tail}`
       ? [Head, ...Split<Tail, D>]
@@ -392,14 +392,14 @@ type ExtractParam<S> = S extends `:${infer P}` ? P : never;
 
 Recursive. The base case is "no more delimiter," wrapping the leftover in a single-element tuple.
 
-- One real-world use case for template literal types beyond event names? #card
+- One real-world use case for template literal types beyond event names? #card #ts/template-literals
   - **Type-safe object paths** (`get(user, 'profile.name')` infers `string`). Or route parameter extraction (`/users/:id` → params have `id`). Both are about deriving structured information from a string shape.
-- Sign you should NOT reach for template literal types? #card
+- Sign you should NOT reach for template literal types? #card #ts/template-literals
   - You're using them to *parse* a string with non-trivial syntax (regex-class operations, deep nesting, error-prone format). The type system is the wrong tool for general string parsing — performance and readability tank.
-- How do template literal types interact with conditional types? #card
+- How do template literal types interact with conditional types? #card #ts/template-literals
   - They compose naturally. The conditional's `extends` clause can include a template literal pattern with `infer` to pattern-match the string. This is how `ExtractParam`, `Split`, `PathValue` all work.
-- {{cloze The expression `Type & 'specific-string'` evaluates to **never** when `'specific-string'` doesn't match any member of the template type — useful for compile-time validation.}} #card
-- Why might a long template-literal-typed identifier produce slow editor responses? #card
+- {{cloze The expression `Type & 'specific-string'` evaluates to **never** when `'specific-string'` doesn't match any member of the template type — useful for compile-time validation.}} #card #ts/template-literals
+- Why might a long template-literal-typed identifier produce slow editor responses? #card #ts/template-literals
   - The TS server evaluates the template type lazily, but inference and "go to type" actions force evaluation. Deep recursion or large unions produce exponential type sizes. Symptom: typing in the file becomes laggy; `tsc` build time grows.
 
 ---

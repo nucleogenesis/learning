@@ -1,6 +1,6 @@
 ---
 title: Mapped-Types
-tags: [learning, typescript, mapped-types]
+tags: [topic/typescript, topic/type-system, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Mapped types — transforming object shapes
@@ -384,11 +384,11 @@ If you can't articulate the leverage, the opening "Why this matters" framing did
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What's a **mapped type**? #card
+- What's a **mapped type**? #card #ts/mapped-types
   - A type of the form `{ [K in T]: U }` that iterates a set of keys (usually `keyof Something`) and produces one property per key. The way to transform every field of an object type at once.
-- Difference between an **index signature** and a **mapped type**? #card
+- Difference between an **index signature** and a **mapped type**? #card #ts/mapped-types
   - Index signatures (`{ [k: string]: V }`) declare "any key of this type maps to V" — open-ended. Mapped types iterate a *specific* finite set of keys and produce one property per key — closed.
-- Write `Partial<T>` from scratch. #card
+- Write `Partial<T>` from scratch. #card #ts/mapped-types
 
 ```ts
 
@@ -397,12 +397,12 @@ type Partial<T> = { [K in keyof T]?: T[K] };
 ```
   - The `?` adds optionality to every field. The built-in version is identical.
 
-- Write `Readonly<T>` from scratch. #card
+- Write `Readonly<T>` from scratch. #card #ts/mapped-types
   - ```ts
     type Readonly<T> = { readonly [K in keyof T]: T[K] };
     ```
 
-- Write `Mutable<T>` (strip readonly). #card
+- Write `Mutable<T>` (strip readonly). #card #ts/mapped-types
 
 ```ts
 
@@ -411,20 +411,20 @@ type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 ```
   - The `-readonly` removes the modifier. Same trick: `-?` strips optionality.
 
-- {{cloze The `-` prefix on a mapped-type modifier (**`-readonly`** or **`-?`**) removes the modifier instead of adding it.}} #card
+- {{cloze The `-` prefix on a mapped-type modifier (**`-readonly`** or **`-?`**) removes the modifier instead of adding it.}} #card #ts/mapped-types
 
-- Key remapping syntax (TS 4.1+)? #card
+- Key remapping syntax (TS 4.1+)? #card #ts/mapped-types
   - ```ts
     type Renamed<T> = { [K in keyof T as NewKey]: T[K] };
     ```
 
 The `as NewKey` expression produces a new key for each iteration. If `NewKey` evaluates to `never` for a given iteration, that key is dropped.
 
-- How do you **filter** keys out of an object via key remapping? #card
+- How do you **filter** keys out of an object via key remapping? #card #ts/mapped-types
   - Map the unwanted keys to `never`. Example: `[K in keyof T as T[K] extends Fn ? K : never]: T[K]` keeps only function-valued keys. The `never`-out-of-remap is the standard delete-a-key trick.
-- One real-world pattern that uses mapped types? #card
+- One real-world pattern that uses mapped types? #card #ts/mapped-types
   - Deriving form-value types from a schema (Zod's `z.infer`, react-hook-form's `FieldValues`). The schema is one source of truth; the form runtime and the type system both consume it.
-- How do you write a **recursive** mapped type for `DeepReadonly`? #card
+- How do you write a **recursive** mapped type for `DeepReadonly`? #card #ts/mapped-types
 
 ```ts
 
@@ -435,9 +435,9 @@ The `as NewKey` expression produces a new key for each iteration. If `NewKey` ev
 ```
   - The recursive call inside the conditional handles nested objects. Filter out functions/arrays if you don't want to recurse into them.
 
-- {{cloze Mapped types compose with **conditional types** — `T[K] extends X ? Y : Z` in the value position enables per-field transformations.}} #card
+- {{cloze Mapped types compose with **conditional types** — `T[K] extends X ? Y : Z` in the value position enables per-field transformations.}} #card #ts/mapped-types
 
-- One gotcha when recursing on `T[K] extends object`? #card
+- One gotcha when recursing on `T[K] extends object`? #card #ts/mapped-types
   - Functions and arrays satisfy `extends object`. The naive `DeepReadonly` recurses into them, which is rarely what you want. Filter them out first: `T[K] extends Function | any[] ? T[K] : T[K] extends object ? ...`.
 
 ---

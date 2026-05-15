@@ -1,6 +1,6 @@
 ---
 title: Shortest-Paths
-tags: [learning, dsa, graphs, shortest-paths, dijkstra, bellman-ford, floyd-warshall]
+tags: [topic/dsa, topic/graphs, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Shortest paths — BFS, Dijkstra, Bellman-Ford, Floyd-Warshall
@@ -365,27 +365,27 @@ If you can't construct the counterexample, the Dijkstra invariant ("first-pop is
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- BFS for shortest paths — what's the constraint? #card
+- BFS for shortest paths — what's the constraint? #card #graphs/shortest-paths #bfs #shortest-path
   - All edges must have the **same weight** (or be unweighted). Time `O(V + E)`.
-- Dijkstra — what's the constraint? #card
+- Dijkstra — what's the constraint? #card #graphs/shortest-paths #dijkstra
   - **Non-negative** edge weights. Fails on negatives.
-- Dijkstra time complexity with binary heap? #card
+- Dijkstra time complexity with binary heap? #card #graphs/shortest-paths #dijkstra #heap #complexity
   - `O((V + E) log V)`.
-- Bellman-Ford — when do you use it? #card
+- Bellman-Ford — when do you use it? #card #graphs/shortest-paths #bellman-ford
   - When the graph has **negative weights** (but no negative cycle). Also detects negative cycles. `O(V · E)`.
-- Bellman-Ford intuition? #card
+- Bellman-Ford intuition? #card #graphs/shortest-paths #bellman-ford
   - Relax every edge `V - 1` times. One more pass; if anything still relaxes, there's a negative cycle.
-- Floyd-Warshall — when do you use it? #card
+- Floyd-Warshall — when do you use it? #card #graphs/shortest-paths #floyd-warshall
   - **All-pairs** shortest paths on **small dense** graphs. `O(V³)` time, `O(V²)` space.
-- Floyd-Warshall recurrence (plain English)? #card
+- Floyd-Warshall recurrence (plain English)? #card #graphs/shortest-paths #floyd-warshall
   - For every triple `(i, j, k)`: is the path from i to j through k cheaper than the current best from i to j? If yes, update. Outer loop is `k`.
-- Why does Dijkstra fail on negative weights? #card
+- Why does Dijkstra fail on negative weights? #card #graphs/shortest-paths #dijkstra
   - It relies on "first-pop is finalized," which depends on adding edges never decreasing path cost. Negative edges break this — a later relaxation could find a cheaper path, but Dijkstra never revisits popped vertices.
-- 0-1 BFS — what's the data structure? #card
+- 0-1 BFS — what's the data structure? #card #graphs/shortest-paths #bfs
   - **Deque**. Push 0-weight neighbors to the *front*, 1-weight to the *back*. Still `O(V + E)`.
-- How does Dijkstra handle stale heap entries? #card
+- How does Dijkstra handle stale heap entries? #card #graphs/shortest-paths #dijkstra #heap
   - Lazy deletion: on pop, check `if d > dist[v]: continue`. Heap may grow to `O(E)` but operations stay `O(log V)`.
-- {{cloze A **negative cycle** in a graph means shortest paths are **unbounded** — you can loop forever, decreasing the total cost.}} #card
+- {{cloze A **negative cycle** in a graph means shortest paths are **unbounded** — you can loop forever, decreasing the total cost.}} #card #graphs/shortest-paths #shortest-path
 
 ---
 

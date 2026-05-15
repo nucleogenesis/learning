@@ -1,6 +1,6 @@
 ---
 title: SCC
-tags: [learning, dsa, graphs, scc, kosaraju, tarjan]
+tags: [topic/dsa, topic/graphs, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Strongly connected components, bridges, articulation points
@@ -400,28 +400,28 @@ If you can't, re-read the "why does it work" section.
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What's a **strongly connected component** (SCC)? #card
+- What's a **strongly connected component** (SCC)? #card #graphs/scc #scc
   - Maximal set of vertices in a directed graph where every pair has directed paths *both* ways.
-- Two classic SCC algorithms? #card
+- Two classic SCC algorithms? #card #graphs/scc #scc
   - **Kosaraju** (2× DFS) and **Tarjan** (single DFS with lowlink).
-- Time complexity for both Kosaraju and Tarjan? #card
+- Time complexity for both Kosaraju and Tarjan? #card #graphs/scc #kosaraju #tarjan #scc #complexity
   - `O(V + E)`.
-- What's the **condensation** of a graph? #card
+- What's the **condensation** of a graph? #card #graphs/scc #scc
   - The DAG you get by collapsing each SCC to a single super-vertex. Always acyclic — by definition of maximality.
-- Kosaraju's two passes — what does each do? #card
+- Kosaraju's two passes — what does each do? #card #graphs/scc #kosaraju #scc
   - Pass 1: DFS on original graph, log finish order. Pass 2: DFS on transpose (reverse) graph, processing vertices in reverse pass-1-finish order. Each DFS in pass 2 reveals one SCC.
-- Why does Kosaraju's pass 2 use the transpose? #card
+- Why does Kosaraju's pass 2 use the transpose? #card #graphs/scc #kosaraju #scc
   - On the transpose, a source SCC in the condensation can only reach its own vertices — outgoing edges from the SCC are now incoming. So DFS reveals exactly that SCC.
-- What's **lowlink** in Tarjan's? #card
+- What's **lowlink** in Tarjan's? #card #graphs/scc #dfs #tarjan #scc
   - The smallest DFS discovery index reachable from `v`'s subtree via at most one back edge. `disc[v] == low[v]` ⇔ `v` is the root of an SCC.
-- What's a **bridge** in an undirected graph? #card
+- What's a **bridge** in an undirected graph? #card #graphs/scc #scc
   - An edge whose removal disconnects the graph. Found in `O(V + E)` via DFS lowlink.
-- What's an **articulation point** in an undirected graph? #card
+- What's an **articulation point** in an undirected graph? #card #graphs/scc #scc
   - A vertex whose removal disconnects the graph. Found in `O(V + E)` via DFS lowlink (with a special case for the DFS root).
-- Condition for `(u, v)` to be a bridge during DFS? #card
+- Condition for `(u, v)` to be a bridge during DFS? #card #graphs/scc #dfs #scc
   - `low[v] > disc[u]` — `v`'s subtree can't reach `u` or any ancestor without using this edge.
-- {{cloze The **condensation** of a directed graph (collapsing each SCC) is always a **DAG**.}} #card
-- {{cloze A graph is a single SCC if and only if you can reach every vertex from every other vertex following the edge directions.}} #card
+- {{cloze The **condensation** of a directed graph (collapsing each SCC) is always a **DAG**.}} #card #graphs/scc #scc #topo-sort
+- {{cloze A graph is a single SCC if and only if you can reach every vertex from every other vertex following the edge directions.}} #card #graphs/scc #scc
 
 ---
 

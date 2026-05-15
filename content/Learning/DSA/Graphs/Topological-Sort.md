@@ -1,6 +1,6 @@
 ---
 title: Topological-Sort
-tags: [learning, dsa, graphs, topological-sort, dag]
+tags: [topic/dsa, topic/graphs, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Topological sort — ordering a DAG
@@ -259,23 +259,23 @@ If you can't explain both halves cleanly, that's a signal to re-trace the post-o
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What input does topological sort require? #card
+- What input does topological sort require? #card #graphs/topo-sort #topo-sort
   - A **DAG** — directed acyclic graph. Cycles make no valid order possible.
-- Time complexity of topological sort (both algorithms)? #card
+- Time complexity of topological sort (both algorithms)? #card #graphs/topo-sort #topo-sort #complexity
   - `O(V + E)`.
-- Kahn's algorithm — one-line summary? #card
+- Kahn's algorithm — one-line summary? #card #graphs/topo-sort #topo-sort
   - Repeatedly pull a source (in-degree 0), append to output, decrement its neighbors' in-degrees.
-- DFS-based toposort — one-line summary? #card
+- DFS-based toposort — one-line summary? #card #graphs/topo-sort #dfs
   - DFS the graph, log vertices in **post-order** (when DFS finishes them), reverse the result.
-- Why does DFS post-order give **reverse** topological order? #card
+- Why does DFS post-order give **reverse** topological order? #card #graphs/topo-sort #dfs
   - DFS finishes a vertex after all its descendants. Sinks finish first; sources finish last. Topological order is the opposite.
-- How does Kahn's algorithm detect a cycle? #card
+- How does Kahn's algorithm detect a cycle? #card #graphs/topo-sort #topo-sort #cycle-detection
   - If after processing the queue the output list has fewer vertices than the graph, some vertices' in-degrees never reached zero — they're stuck in a cycle.
-- How does DFS-based toposort detect a cycle? #card
+- How does DFS-based toposort detect a cycle? #card #graphs/topo-sort #dfs #cycle-detection
   - The white/gray/black machinery: a back edge to a GRAY vertex means a cycle.
-- {{cloze A vertex with in-degree 0 is called a **source**; with out-degree 0, a **sink**.}} #card
-- {{cloze Topological order is **not unique** in general — any ordering consistent with all dependencies is valid.}} #card
-- How do you get the lexicographically smallest toposort? #card
+- {{cloze A vertex with in-degree 0 is called a **source**; with out-degree 0, a **sink**.}} #card #graphs/topo-sort
+- {{cloze Topological order is **not unique** in general — any ordering consistent with all dependencies is valid.}} #card #graphs/topo-sort
+- How do you get the lexicographically smallest toposort? #card #graphs/topo-sort
   - Kahn's with a min-heap instead of a queue. Pop the smallest-named source at each step. `O((V + E) log V)`.
 
 ---

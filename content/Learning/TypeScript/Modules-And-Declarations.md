@@ -1,6 +1,6 @@
 ---
 title: Modules-And-Declarations
-tags: [learning, typescript, modules, declarations]
+tags: [topic/typescript, topic/type-system, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Modules and declarations — `.d.ts`, augmentation, ambients
@@ -448,27 +448,27 @@ If you can't, the augmentation mechanics didn't click.
 
 ## 🎴 Flashcards (for daily review, not the first read)
 
-- What's a **`.d.ts` file**? #card
+- What's a **`.d.ts` file**? #card #ts/modules
   - A TypeScript declaration file. Contains only type information — no runtime code. Used to describe the shape of JavaScript (a library, a global, an environment).
-- When to write your own `.d.ts` for a library? #card
+- When to write your own `.d.ts` for a library? #card #ts/modules
   - When the library doesn't ship types AND has no `@types/library` on DefinitelyTyped. Three-minute fix that turns red squigglies into autocomplete forever.
-- What does `declare module 'foo'` do? #card
+- What does `declare module 'foo'` do? #card #ts/modules
   - Declares the shape of a module named `'foo'` ambiently. If the module already has types, this *augments* them (merging interfaces). If it doesn't, this provides them.
-- {{cloze Two `interface Foo` declarations with the same name in the same scope **merge** into one combined interface. Two `type Foo` declarations are a **duplicate-identifier error**.}} #card
-- Why does the `interface` vs `type` distinction matter for libraries? #card
+- {{cloze Two `interface Foo` declarations with the same name in the same scope **merge** into one combined interface. Two `type Foo` declarations are a **duplicate-identifier error**.}} #card #ts/modules
+- Why does the `interface` vs `type` distinction matter for libraries? #card #ts/modules
   - Interfaces can be **augmented from outside** (declaration merging). Type aliases cannot. Library authors choose `interface` for types they want consumers to extend (e.g., Express's `Request`, React's `CSSProperties`).
-- What's **module augmentation**? #card
+- What's **module augmentation**? #card #ts/modules
   - Re-opening a third-party module's declaration from your own code to add fields/types. The mechanism is declaration merging — your `interface Request { user?: User }` joins the library's `interface Request { ... }`.
-- Required boilerplate when augmenting a module? #card
+- Required boilerplate when augmenting a module? #card #ts/modules
   - The file must be a **module** (have at least one `import` or `export`). The augmenting block goes inside `declare module 'name' { interface Foo { ... } }`. Often you also need `import 'name';` to pull in the original types.
-- What does `export {};` do at the end of a `.d.ts`? #card
+- What does `export {};` do at the end of a `.d.ts`? #card #ts/modules
   - Marks the file as a module rather than a script. Required when using `declare global` from a file that has no other imports/exports.
-- One use of a **wildcard ambient module**? #card
+- One use of a **wildcard ambient module**? #card #ts/modules
   - `declare module '*.png' { const src: string; export default src; }` — lets you import asset files in a bundler-driven project (Vite, Webpack) without type errors.
-- {{cloze When augmenting Express's `Request`, target the **`express-serve-static-core`** module, not `'express'` — that's where the interface is actually declared.}} #card
-- What are triple-slash directives, and when do you write new ones? #card
+- {{cloze When augmenting Express's `Request`, target the **`express-serve-static-core`** module, not `'express'` — that's where the interface is actually declared.}} #card #ts/modules
+- What are triple-slash directives, and when do you write new ones? #card #ts/modules
   - `/// <reference path="..." />` and `/// <reference types="..." />` — pre-module syntax for cross-`.d.ts` dependencies. **Mostly historical.** You read them in legacy code and `@types/` packages; you rarely write new ones.
-- Workflow when you `npm install` something untyped? #card
+- Workflow when you `npm install` something untyped? #card #ts/modules
   - (1) Try `npm install -D @types/the-library`. (2) If absent, write `types/the-library.d.ts` with `declare module 'the-library' { ... }` and add to tsconfig `include`. (3) Type incrementally — start with stubs for what you use, add more as you go.
 
 ---

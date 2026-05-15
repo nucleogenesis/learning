@@ -1,6 +1,6 @@
 ---
 title: Trees
-tags: [learning, dsa, trees]
+tags: [topic/dsa, topic/trees, kind/hub]
 lastUpdated: 2026-05-15
 ---
 # Trees — topic hub

@@ -1,6 +1,6 @@
 ---
 title: Foundations
-tags: [learning, typescript, foundations]
+tags: [topic/typescript, topic/type-system, kind/concept]
 lastUpdated: 2026-05-15
 ---
 # Foundations — beyond the basics
@@ -288,21 +288,21 @@ If you can't, the structural-typing section didn't land. Re-read the worked exam
 
 These get surfaced by Logseq's flashcard queue. **Don't drill on first read — that's cramming.**
 
-- TypeScript's type system matches on... #card
+- TypeScript's type system matches on... #card #ts/foundations
   - **Structure (shape)**, not name. Two unrelated types with the same fields are interchangeable. This is "structural typing" or sometimes "duck typing at compile time."
-- {{cloze TypeScript uses **structural** typing; Java/C# use **nominal** typing.}} #card
-- One real bug that structural typing fails to catch on its own? #card
+- {{cloze TypeScript uses **structural** typing; Java/C# use **nominal** typing.}} #card #ts/foundations
+- One real bug that structural typing fails to catch on its own? #card #ts/foundations
   - Mixing up two string-aliased types that are semantically distinct (e.g., `UserId` vs `Email`). Both reduce to `string`, so they're interchangeable. Fix: branded types ([[Learning/TypeScript/Branded-Types]]).
-- Default choice: `type` or `interface`? #card
+- Default choice: `type` or `interface`? #card #ts/foundations
   - **`type`**. It supports unions, mapped types, conditional types, template literals. Reach for `interface` when you specifically want declaration merging (extending third-party types or `Window`).
-- One thing `interface` can do that `type` can't? #card
+- One thing `interface` can do that `type` can't? #card #ts/foundations
   - **Declaration merging**: multiple `interface User { ... }` declarations in the same scope auto-merge. Essential for module augmentation.
-- One thing `type` can do that `interface` can't? #card
+- One thing `type` can do that `interface` can't? #card #ts/foundations
   - **Union types** (`type X = A | B`), plus mapped, conditional, and template literal types. The most common reason to default to `type`.
-- Why does `const x = 'hello'` get type `'hello'` but `let y = 'hello'` get type `string`? #card
+- Why does `const x = 'hello'` get type `'hello'` but `let y = 'hello'` get type `string`? #card #ts/foundations
   - `const` can never be reassigned, so the type is narrowed to the literal. `let` might be reassigned, so it widens to the base type to stay useful.
-- {{cloze `as const` tells the compiler to **not widen** — literals stay literal, arrays become readonly tuples, objects become readonly with literal fields.}} #card
-- Idiom: derive a union type from a const array of strings? #card
+- {{cloze `as const` tells the compiler to **not widen** — literals stay literal, arrays become readonly tuples, objects become readonly with literal fields.}} #card #ts/foundations #as-const
+- Idiom: derive a union type from a const array of strings? #card #ts/foundations
 
 ```ts
 
@@ -313,12 +313,12 @@ type Color = typeof COLORS[number];
 ```
   - Both the values and the type come from one source. Add a color → change one line.
 
-- {{cloze Inside `if (typeof x === 'string') { ... }`, TypeScript **narrows** `x` to `string`.}} #card
+- {{cloze Inside `if (typeof x === 'string') { ... }`, TypeScript **narrows** `x` to `string`.}} #card #ts/foundations
 
-- Rule of thumb: when to annotate types explicitly? #card
+- Rule of thumb: when to annotate types explicitly? #card #ts/foundations
   - At module boundaries (exported function signatures, public APIs, return types of complex functions). Skip annotation for local variables when inference is obvious. Annotating everything is noise.
 
-- The `<const T>` generic syntax (TS 5.0+) does what? #card
+- The `<const T>` generic syntax (TS 5.0+) does what? #card #ts/foundations
   - Opts into const-like inference for the type parameter. Without it, a generic over `T` widens literal arguments. With it, literals stay narrow at the call site without the caller needing `as const`.
 
 ---
